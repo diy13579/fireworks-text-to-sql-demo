@@ -1,0 +1,53 @@
+name: Deploy browser demo to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Generate sanitized demo assets
+        run: python scripts/build_demo_assets.py
+
+      - name: Run credential-free tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Build Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site/data
+          cp -R docs/. _site/
+          cp data/financial.sqlite _site/data/financial.sqlite
+          cp BIRD_LICENSE.md _site/data/BIRD_LICENSE.md
+          touch _site/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

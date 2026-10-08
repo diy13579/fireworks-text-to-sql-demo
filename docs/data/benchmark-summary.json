@@ -1,0 +1,41 @@
+{
+  "status": "Historical proof-of-concept evidence",
+  "candidate_tests": {
+    "passed": 26,
+    "total": 26
+  },
+  "models": [
+    {
+      "name": "Kimi K2.6",
+      "run": "cache-affinity baseline",
+      "accuracy": "10/10",
+      "p50": "7.271s",
+      "p95": "31.586s",
+      "status": "Retired"
+    },
+    {
+      "name": "DeepSeek V4 Pro (0813)",
+      "run": "single baseline",
+      "accuracy": "10/10",
+      "p50": "6.089s",
+      "p95": "10.003s",
+      "status": "Historical"
+    },
+    {
+      "name": "GLM 5.3 Fast",
+      "run": "Run A",
+      "accuracy": "10/10",
+      "p50": "0.804s",
+      "p95": "5.004s",
+      "status": "Latency target"
+    },
+    {
+      "name": "GLM 5.3 Fast",
+      "run": "three-run combined",
+      "accuracy": "28/30",
+      "p50": "0.716s",
+      "p95": "5.811s",
+      "status": "Semantic regression observed"
+    }
+  ]
+}

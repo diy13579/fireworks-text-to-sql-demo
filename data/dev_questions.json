@@ -1,0 +1,52 @@
+[
+  {
+    "id": "q_001",
+    "question": "How many bank accounts are located in the Prague region?",
+    "tier": 1
+  },
+  {
+    "id": "q_002",
+    "question": "What is the total approved loan amount for loans whose contract is finished and fully paid with no problems?",
+    "tier": 1
+  },
+  {
+    "id": "q_003",
+    "question": "How many disposition records represent account owners (not authorized users)?",
+    "tier": 1
+  },
+  {
+    "id": "q_004",
+    "question": "What is the average monthly loan payment amount across all loans?",
+    "tier": 1
+  },
+  {
+    "id": "q_005",
+    "question": "How many female clients live in districts where the average salary is greater than 10,000?",
+    "tier": 2
+  },
+  {
+    "id": "q_006",
+    "question": "How many distinct clients are account owners for at least one account in the Prague region?",
+    "tier": 2
+  },
+  {
+    "id": "q_007",
+    "question": "What is the total transaction amount for account 1 during 1997?",
+    "tier": 2
+  },
+  {
+    "id": "q_008",
+    "question": "For each district in the south Moravia region, how many distinct account owners are there? List district name and owner count, ordered by owner count descending.",
+    "tier": 3
+  },
+  {
+    "id": "q_009",
+    "question": "Which five clients with account owner status have the highest total loan amounts across their owned accounts? Show client id, gender, and total loan amount.",
+    "tier": 3
+  },
+  {
+    "id": "q_010",
+    "question": "How many running loan contracts that are in good standing are linked to accounts owned by male clients living in the north Bohemia region?",
+    "tier": 3
+  }
+]

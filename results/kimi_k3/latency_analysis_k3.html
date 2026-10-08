@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kimi K3 Text-to-SQL Evaluation</title>
+  <meta name="description" content="Quality, latency, cache, token, server, cost, and SQLite analysis for the Kimi K3 text-to-SQL benchmark.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #17201d;
+      --muted: #5b6661;
+      --paper: #f4f2ec;
+      --surface: #fffefa;
+      --line: #d8d6ce;
+      --green: #147a5a;
+      --green-soft: #dcece5;
+      --red: #c84735;
+      --red-soft: #f6dfd9;
+      --amber: #a76a12;
+      --amber-soft: #f5e8c9;
+      --blue: #28658a;
+      --blue-soft: #dce9ef;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(23, 32, 29, .035) 32px),
+        repeating-linear-gradient(90deg, transparent 0, transparent 31px, rgba(23, 32, 29, .035) 32px);
+      font-family: "Manrope", sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+    .shell { width: min(calc(100% - 40px), var(--max)); margin: 0 auto; }
+    .mono, .eyebrow { font-family: "IBM Plex Mono", monospace; letter-spacing: 0; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgba(244, 242, 236, .94);
+      backdrop-filter: blur(12px);
+    }
+    .topbar .shell { min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { font-weight: 700; }
+    .brand span { color: var(--blue); }
+    nav { display: flex; gap: 20px; color: var(--muted); font-size: 13px; }
+    nav a { text-decoration: none; }
+    nav a:hover { color: var(--ink); }
+
+    header { padding: 72px 0 46px; border-bottom: 1px solid var(--line); }
+    .eyebrow { color: var(--blue); font-size: 12px; font-weight: 500; text-transform: uppercase; }
+    h1 { max-width: 900px; margin: 14px 0 18px; font-size: 60px; line-height: 1.02; letter-spacing: 0; }
+    .lede { max-width: 820px; margin: 0; color: var(--muted); font-size: 18px; }
+    .verdict { max-width: 940px; margin-top: 30px; padding: 18px 20px; border-left: 5px solid var(--amber); background: var(--amber-soft); font-weight: 600; }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); background: var(--surface); }
+    .metric { min-height: 150px; padding: 26px; border-right: 1px solid var(--line); }
+    .metric:last-child { border-right: 0; }
+    .metric-label { color: var(--muted); font-size: 13px; }
+    .metric-value { margin: 8px 0 2px; font-size: 35px; line-height: 1; font-weight: 700; }
+    .metric-note { color: var(--muted); font-size: 12px; }
+    .good { color: var(--green); }
+    .bad { color: var(--red); }
+    .mixed { color: var(--amber); }
+    .blue { color: var(--blue); }
+
+    main section { padding: 66px 0; border-bottom: 1px solid var(--line); }
+    .section-grid { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 64px; }
+    .section-grid > *, .chart-grid > *, .signal-grid > * { min-width: 0; }
+    .section-intro h2 { margin: 8px 0 14px; font-size: 28px; line-height: 1.15; }
+    .section-intro p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .panel { border: 1px solid var(--line); background: var(--surface); }
+    .panel-head { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .panel-head h3 { margin: 0; font-size: 16px; }
+    .panel-note { color: var(--muted); font-size: 11px; }
+    .evidence-wrap { overflow-x: auto; }
+    .comparison { width: 100%; min-width: 680px; border-collapse: collapse; font-size: 13px; }
+    .comparison th, .comparison td { padding: 13px 15px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; }
+    .comparison th:first-child, .comparison td:first-child { text-align: left; }
+    .comparison th { color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; }
+    .comparison tr:last-child td { border-bottom: 0; }
+    .delta-good { color: var(--green); font-weight: 700; }
+    .delta-bad { color: var(--red); font-weight: 700; }
+
+    .callout { margin-top: 18px; padding: 18px 20px; border: 1px solid #b8cbd5; background: var(--blue-soft); font-size: 14px; }
+    .callout.warning { border-color: #d9bd83; background: var(--amber-soft); }
+    .callout.failure { border-color: #dfaaa1; background: var(--red-soft); }
+
+    .bars { padding: 16px 20px 20px; }
+    .bar-row { display: grid; grid-template-columns: 58px minmax(0, 1fr) 82px; gap: 12px; align-items: center; min-height: 38px; }
+    .bar-label, .bar-value { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+    .bar-value { text-align: right; }
+    .track { position: relative; height: 14px; background: #e9e7e0; overflow: visible; }
+    .latency-track::after { content: ""; position: absolute; top: -5px; bottom: -5px; left: 33.93%; width: 2px; background: var(--red); }
+    .fill { height: 100%; min-width: 2px; transform-origin: left; animation: grow .8s ease-out both; }
+    .fill.pass { background: var(--blue); }
+    .fill.fail { background: var(--red); }
+    @keyframes grow { from { transform: scaleX(0); } }
+    .chart-note { margin: 8px 20px 18px; color: var(--muted); font-size: 12px; }
+    .target-line { color: var(--red); font-weight: 700; }
+
+    .signal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .signal { min-height: 170px; padding: 22px; border: 1px solid var(--line); background: var(--surface); }
+    .signal strong { display: block; margin: 8px 0; font-size: 34px; line-height: 1; }
+    .signal p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .evidence { width: 100%; min-width: 760px; border-collapse: collapse; border: 1px solid var(--line); background: var(--surface); font-size: 13px; }
+    .evidence th, .evidence td { padding: 13px 15px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .evidence th { color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; }
+    .evidence tr:last-child td { border-bottom: 0; }
+    .evidence td.num, .evidence th.num { text-align: right; }
+    .tag { display: inline-block; padding: 3px 7px; border: 1px solid currentColor; font-family: "IBM Plex Mono", monospace; font-size: 10px; text-transform: uppercase; }
+    .tag.pass { color: var(--green); background: var(--green-soft); }
+    .tag.fail { color: var(--red); background: var(--red-soft); }
+    .tag.measured { color: var(--blue); background: var(--blue-soft); }
+
+    .steps { counter-reset: step; display: grid; gap: 1px; border: 1px solid var(--line); background: var(--line); }
+    .step { counter-increment: step; display: grid; grid-template-columns: 52px minmax(0, 1fr) 180px; gap: 20px; padding: 22px; background: var(--surface); }
+    .step::before { content: counter(step, decimal-leading-zero); color: var(--blue); font-family: "IBM Plex Mono", monospace; font-weight: 500; }
+    .step h3 { margin: 0 0 6px; font-size: 16px; }
+    .step p { margin: 0; color: var(--muted); font-size: 13px; }
+    .step-impact { align-self: center; text-align: right; font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+
+    .decision { margin-top: 22px; padding: 22px; border: 1px solid var(--line); background: var(--ink); color: #f7f5ef; }
+    .decision h3 { margin: 0 0 14px; }
+    .decision-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .decision-grid div { border-top: 1px solid #52605a; padding-top: 10px; }
+    .decision-grid span { display: block; color: #aeb8b3; font-size: 11px; }
+    .decision-grid strong { display: block; margin-top: 5px; font-size: 13px; }
+
+    footer { padding: 34px 0 50px; color: var(--muted); font-size: 12px; }
+    footer .shell { display: flex; justify-content: space-between; gap: 20px; }
+
+    @media (max-width: 900px) {
+      nav { display: none; }
+      h1 { font-size: 48px; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric:nth-child(2) { border-right: 0; }
+      .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .section-grid { grid-template-columns: 1fr; gap: 26px; }
+      .signal-grid { grid-template-columns: 1fr; }
+      .decision-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .shell { width: auto; max-width: none; margin-left: 12px; margin-right: 12px; }
+      header { padding-top: 48px; }
+      h1 { font-size: 38px; }
+      .metrics { grid-template-columns: 1fr; }
+      .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+      .metric:last-child { border-bottom: 0; }
+      .bar-row { grid-template-columns: 48px minmax(0, 1fr) 62px; gap: 8px; }
+      .step { grid-template-columns: 40px minmax(0, 1fr); }
+      .step-impact { grid-column: 2; text-align: left; }
+      .decision-grid { grid-template-columns: 1fr; }
+      footer .shell { display: block; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .fill { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="shell">
+      <div class="brand">Text-to-SQL <span>/ Kimi K3 review</span></div>
+      <nav aria-label="Report sections">
+        <a href="#comparison">Comparison</a>
+        <a href="#distribution">Distribution</a>
+        <a href="#attribution">Attribution</a>
+        <a href="#decision">Decision</a>
+      </nav>
+    </div>
+  </div>
+
+  <header>
+    <div class="shell">
+      <div class="eyebrow">Kimi K3 benchmark &middot; September 19, 2026</div>
+      <h1>K3 is faster. Quality is the tradeoff.</h1>
+      <p class="lede">Kimi K3 cut P50 latency to 5.22 seconds and P95 to 8.21 seconds on the ten-question benchmark. It passed nine questions, missing the transaction-year case, so it improves responsiveness without yet clearing either the accuracy or sub-three-second P50 gate.</p>
+      <div class="verdict">Recommendation: continue K3 as a latency candidate, not as the production winner. Repair the general date-filtering weakness, verify prompt-cache behavior, and repeat the benchmark before comparing a K3 or K3 Fast path with the 10/10 K2.6 baseline.</div>
+    </div>
+  </header>
+
+  <div class="shell metrics" aria-label="Kimi K3 benchmark metrics">
+    <div class="metric">
+      <div class="metric-label">Execution accuracy</div>
+      <div class="metric-value bad">9/10</div>
+      <div class="metric-note">One semantic SQL failure</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">P50 end-to-end</div>
+      <div class="metric-value mixed">5.22s</div>
+      <div class="metric-note">28.2% faster than cached K2.6</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">P95 end-to-end</div>
+      <div class="metric-value good">8.21s</div>
+      <div class="metric-note">Below the 10-second tail goal</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Estimated run cost</div>
+      <div class="metric-value blue">$0.0647</div>
+      <div class="metric-note">Standard serverless list price</div>
+    </div>
+  </div>
+
+  <main>
+    <section id="comparison">
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">01 / Comparison</div>
+          <h2>A faster but less accurate frontier</h2>
+          <p>The comparison holds the prompt, schema, questions, cache-key strategy, and low reasoning effort constant. It uses one run per model, so latency deltas are directional rather than an SLA.</p>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-head"><h3>Cached K2.6 versus K3</h3><span class="panel-note">Same ten-question suite</span></div>
+            <div class="evidence-wrap">
+              <table class="comparison">
+                <thead><tr><th>Metric</th><th>K2.6 cache</th><th>K3</th><th>K3 change</th></tr></thead>
+                <tbody>
+                  <tr><td>Execution accuracy</td><td>100%</td><td>90%</td><td class="delta-bad">-10 pp</td></tr>
+                  <tr><td>Mean latency</td><td>11.80s</td><td>5.12s</td><td class="delta-good">-56.6%</td></tr>
+                  <tr><td>P50 latency</td><td>7.27s</td><td>5.22s</td><td class="delta-good">-28.2%</td></tr>
+                  <tr><td>P95 latency</td><td>31.59s</td><td>8.21s</td><td class="delta-good">-74.0%</td></tr>
+                  <tr><td>Maximum latency</td><td>34.14s</td><td>8.84s</td><td class="delta-good">-74.1%</td></tr>
+                  <tr><td>Completion tokens</td><td>10,687</td><td>1,436</td><td class="delta-good">-86.6%</td></tr>
+                  <tr><td>Cache hit rate</td><td>88.36%</td><td>0.00%</td><td class="delta-bad">-88.36 pp</td></tr>
+                  <tr><td>Estimated run cost</td><td>$0.0459</td><td>$0.0647</td><td class="delta-bad">+41.0%</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="callout warning"><strong>Interpret carefully:</strong> K3 generated far fewer completion tokens, which is the main reason this run was faster. Its higher token prices ($3.00 input, $0.30 cached input, and $15.00 output per million) made the run more expensive despite lower usage.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="distribution">
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">02 / Distribution</div>
+          <h2>Tail target met, median target missed</h2>
+          <p>Two requests completed below three seconds. Eight remained above the interactive target, although none exceeded nine seconds.</p>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-head"><h3>End-to-end latency by question</h3><span class="panel-note">Red bar = incorrect result</span></div>
+            <div class="bars">
+              <div class="bar-row"><div class="bar-label">q_001</div><div class="track latency-track"><div class="fill pass" style="width:69.16%"></div></div><div class="bar-value">6.12s</div></div>
+              <div class="bar-row"><div class="bar-label">q_002</div><div class="track latency-track"><div class="fill pass" style="width:29.46%"></div></div><div class="bar-value">2.61s</div></div>
+              <div class="bar-row"><div class="bar-label">q_003</div><div class="track latency-track"><div class="fill pass" style="width:71.47%"></div></div><div class="bar-value">6.32s</div></div>
+              <div class="bar-row"><div class="bar-label">q_004</div><div class="track latency-track"><div class="fill pass" style="width:35.94%"></div></div><div class="bar-value">3.18s</div></div>
+              <div class="bar-row"><div class="bar-label">q_005</div><div class="track latency-track"><div class="fill pass" style="width:40.57%"></div></div><div class="bar-value">3.59s</div></div>
+              <div class="bar-row"><div class="bar-label">q_006</div><div class="track latency-track"><div class="fill pass" style="width:84.11%"></div></div><div class="bar-value">7.44s</div></div>
+              <div class="bar-row"><div class="bar-label">q_007</div><div class="track latency-track"><div class="fill fail" style="width:50.38%"></div></div><div class="bar-value">4.46s</div></div>
+              <div class="bar-row"><div class="bar-label">q_008</div><div class="track latency-track"><div class="fill pass" style="width:100%"></div></div><div class="bar-value">8.84s</div></div>
+              <div class="bar-row"><div class="bar-label">q_009</div><div class="track latency-track"><div class="fill pass" style="width:29.75%"></div></div><div class="bar-value">2.63s</div></div>
+              <div class="bar-row"><div class="bar-label">q_010</div><div class="track latency-track"><div class="fill pass" style="width:67.61%"></div></div><div class="bar-value">5.98s</div></div>
+            </div>
+            <div class="chart-note"><span class="target-line">Red marker</span> = 3-second target. Scale maximum = 8.84 seconds.</div>
+          </div>
+          <div class="callout failure"><strong>Quality failure, q_007:</strong> K3 generated <span class="mono">date LIKE '97%'</span> against ISO-formatted dates and returned <span class="mono">NULL</span> instead of 96,418. The SQL executed, so execution-error repair did not activate. This needs semantic validation or a general ISO-year prompting rule.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="attribution">
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">03 / Attribution</div>
+          <h2>Server processing controls latency</h2>
+          <p>Fireworks performance metrics and reasoning-token usage were captured in the response, while SQLite was timed locally inside the agent.</p>
+        </div>
+        <div>
+          <div class="signal-grid">
+            <div class="signal"><span class="eyebrow">Server share</span><strong class="blue">87.1%</strong><p>44.567 of 51.153 total wall-clock seconds were reported as Fireworks server processing.</p></div>
+            <div class="signal"><span class="eyebrow">Reasoning share</span><strong class="mixed">57.8%</strong><p>830 of 1,436 completion tokens were reasoning tokens.</p></div>
+            <div class="signal"><span class="eyebrow">SQLite replay median</span><strong class="good">3.303ms</strong><p>Median across 300 measured local executions, 30 per final query.</p></div>
+          </div>
+
+          <div class="panel" style="margin-top:12px">
+            <div class="panel-head"><h3>Per-question execution evidence</h3><span class="panel-note">Seconds except SQLite</span></div>
+            <div class="evidence-wrap">
+              <table class="evidence">
+                <thead><tr><th>Question</th><th class="num">End-to-end</th><th class="num">TTFT</th><th class="num">Server</th><th class="num">Reasoning</th><th class="num">SQLite replay</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>q_001</td><td class="num">6.116</td><td class="num">0.793</td><td class="num">3.523</td><td class="num">69</td><td class="num">4.527ms</td><td><span class="tag pass">Pass</span></td></tr>
+                  <tr><td>q_002</td><td class="num">2.605</td><td class="num">0.864</td><td class="num">2.301</td><td class="num">32</td><td class="num">1.339ms</td><td><span class="tag pass">Pass</span></td></tr>
+                  <tr><td>q_003</td><td class="num">6.320</td><td class="num">4.672</td><td class="num">5.915</td><td class="num">40</td><td class="num">2.895ms</td><td><span class="tag pass">Pass</span></td></tr>
+                  <tr><td>q_004</td><td class="num">3.178</td><td class="num">0.578</td><td class="num">2.837</td><td class="num">56</td><td class="num">1.332ms</td><td><span class="tag pass">Pass</span></td></tr>
+                  <tr><td>q_005</td><td class="num">3.588</td><td class="num">0.467</td><td class="num">3.303</td><td class="num">105</td><td class="num">5.093ms</td><td><span class="tag pass">Pass</span></td></tr>
+                  <tr><td>q_006</td><td class="num">7.438</td><td class="num">0.943</td><td class="num">6.605</td><td class="num">156</td><td class="num">7.432ms</td><td><span class="tag pass">Pass</span></td></tr>
+                  <tr><td>q_007</td><td class="num">4.455</td><td class="num">0.718</td><td class="num">3.477</td><td class="num">90</td><td class="num">680.674ms</td><td><span class="tag fail">Fail</span></td></tr>
+                  <tr><td>q_008</td><td class="num">8.843</td><td class="num">0.758</td><td class="num">8.518</td><td class="num">232</td><td class="num">2.661ms</td><td><span class="tag pass">Pass</span></td></tr>
+                  <tr><td>q_009</td><td class="num">2.631</td><td class="num">0.731</td><td class="num">2.389</td><td class="num">8</td><td class="num">1.764ms</td><td><span class="tag pass">Pass</span></td></tr>
+                  <tr><td>q_010</td><td class="num">5.979</td><td class="num">1.870</td><td class="num">5.699</td><td class="num">42</td><td class="num">3.708ms</td><td><span class="tag pass">Pass</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="callout"><strong>Attribution:</strong> end-to-end latency correlates at +0.942 with Fireworks server processing, +0.743 with completion tokens, and +0.732 with reasoning tokens. Among the nine correct queries, local SQLite replay remains below 0.15% of end-to-end time. The failed q_007 query forces a 681ms scan, but server processing still accounts for most of that request.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">04 / Cache and cost</div>
+          <h2>K3 caching needs a controlled retest</h2>
+          <p>The benchmark sent a stable model-and-schema cache key but reported no cached tokens across the ten different questions.</p>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-head"><h3>Usage summary</h3><span class="panel-note">Standard serverless</span></div>
+            <div class="evidence-wrap">
+              <table class="comparison">
+                <thead><tr><th>Metric</th><th>Value</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                  <tr><td>Prompt tokens</td><td>14,383</td><td>All billed as uncached in the benchmark</td></tr>
+                  <tr><td>Cached prompt tokens</td><td>0</td><td>No shared-prefix hits observed</td></tr>
+                  <tr><td>Completion tokens</td><td>1,436</td><td>Includes 830 reasoning tokens</td></tr>
+                  <tr><td>Total tokens</td><td>15,819</td><td>10 API calls, one per question</td></tr>
+                  <tr><td>Estimated cost</td><td>$0.0647</td><td>$3.00/M input + $15.00/M output</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="callout"><strong>Capability check:</strong> a later identical-prompt probe reported 1,426 of 1,427 prompt tokens cached, and its second request completed in 3.50 seconds. K3 caching is available, but this benchmark did not realize cross-question prefix hits. Cache affinity improves routing; it does not guarantee residency or a hit.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="decision">
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">05 / Decision</div>
+          <h2>Promising candidate, not yet a winner</h2>
+          <p>K3 moved the latency frontier in the right direction, but the quality regression and P50 miss prevent a production recommendation from this run.</p>
+        </div>
+        <div>
+          <div class="steps">
+            <div class="step"><div><h3>Fix the general date rule</h3><p>Explicitly require ISO calendar-year filters using <span class="mono">strftime('%Y', date)</span> or half-open date ranges, then validate on held-out date questions.</p></div><div class="step-impact">Recover quality gate</div></div>
+            <div class="step"><div><h3>Repeat cache trials</h3><p>Run cold and warm suites separately with five repetitions per question. Keep the K3 model/schema key fixed and report cache residency.</p></div><div class="step-impact">Make latency defensible</div></div>
+            <div class="step"><div><h3>Evaluate K3 Fast</h3><p>Benchmark <span class="mono">accounts/fireworks/routers/kimi-k3-fast</span> against the same execution checks. Its list price is 50% above standard K3.</p></div><div class="step-impact">Best K3 speed test</div></div>
+            <div class="step"><div><h3>Test a fast-primary cascade</h3><p>Return validated SQL from the fastest accurate model and reserve K2.6 or K3 for execution failures and ambiguity.</p></div><div class="step-impact">Balance quality and P50</div></div>
+          </div>
+
+          <div class="decision">
+            <h3>Go / no-go summary</h3>
+            <div class="decision-grid">
+              <div><span>Quality gate</span><strong>No-go: 90% versus required &ge;95%</strong></div>
+              <div><span>P50 gate</span><strong>No-go: 5.22s versus &lt;3s</strong></div>
+              <div><span>P95 gate</span><strong>Pass: 8.21s versus &lt;10s</strong></div>
+              <div><span>Next decision</span><strong>Retest K3 Fast after date-rule fix</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <span>Sources: evaluation_results_k3.json &middot; SQLite replay: 30 runs/query</span>
+      <span class="mono">model: accounts/fireworks/models/kimi-k3</span>
+    </div>
+  </footer>
+</body>
+</html>

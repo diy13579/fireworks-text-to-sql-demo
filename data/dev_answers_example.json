@@ -1,0 +1,14 @@
+{
+  "q_001": {
+    "sql": "<SQL your agent generated for q_001>",
+    "answer": "<result your agent reported>"
+  },
+  "q_002": {
+    "sql": "<SQL your agent generated for q_002>",
+    "answer": "<result your agent reported>"
+  },
+  "q_003": {
+    "sql": "<SQL your agent generated for q_003>",
+    "answer": "<result your agent reported>"
+  }
+}

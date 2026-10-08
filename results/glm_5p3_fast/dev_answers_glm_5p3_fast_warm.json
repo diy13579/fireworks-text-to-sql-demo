@@ -1,0 +1,42 @@
+{
+  "q_001": {
+    "sql": "SELECT COUNT(*) FROM account WHERE district_id = (SELECT district_id FROM district WHERE A2 = 'Prague')",
+    "answer": "COUNT(*): 0"
+  },
+  "q_002": {
+    "sql": "SELECT SUM(amount) FROM loan WHERE status = 'A'",
+    "answer": "SUM(amount): 18603216"
+  },
+  "q_003": {
+    "sql": "SELECT COUNT(*) FROM disp WHERE type = 'OWNER'",
+    "answer": "COUNT(*): 4500"
+  },
+  "q_004": {
+    "sql": "SELECT ROUND(AVG(payments), 2) FROM loan",
+    "answer": "ROUND(AVG(payments), 2): 4190.66"
+  },
+  "q_005": {
+    "sql": "SELECT COUNT(*) FROM client c JOIN district d ON c.district_id = d.district_id WHERE c.gender = 'F' AND d.A11 > 10000",
+    "answer": "COUNT(*): 636"
+  },
+  "q_006": {
+    "sql": "SELECT COUNT(DISTINCT d.client_id) FROM disp d JOIN account a ON d.account_id = a.account_id JOIN district di ON a.district_id = di.district_id WHERE d.type = 'OWNER' AND di.A3 = 'Prague'",
+    "answer": "COUNT(DISTINCT d.client_id): 554"
+  },
+  "q_007": {
+    "sql": "SELECT SUM(amount) FROM trans WHERE account_id = 1 AND strftime('%Y', date) = '1997'",
+    "answer": "SUM(amount): 96418"
+  },
+  "q_008": {
+    "sql": "SELECT d.A2 AS district_name, COUNT(DISTINCT disp.client_id) AS owner_count FROM district d JOIN account a ON a.district_id = d.district_id JOIN disp ON disp.account_id = a.account_id AND disp.type = 'OWNER' WHERE d.A3 = 'south Moravia' GROUP BY d.district_id, d.A2 ORDER BY owner_count DESC",
+    "answer": "[{\"district_name\": \"Brno - mesto\", \"owner_count\": 128}, {\"district_name\": \"Zlin\", \"owner_count\": 92}, {\"district_name\": \"Kromeriz\", \"owner_count\": 57}, {\"district_name\": \"Brno - venkov\", \"owner_count\": 53}, {\"district_name\": \"Zdar nad Sazavou\", \"owner_count\": 53}, {\"district_name\": \"Prostejov\", \"owner_count\": 51}, {\"district_name\": \"Blansko\", \"owner_count\": 50}, {\"district_name\": \"Vyskov\", \"owner_count\": 49}, {\"district_name\": \"Trebic\", \"owner_count\": 45}, {\"district_name\": \"Breclav\", \"owner_count\": 44}, {\"district_name\": \"Uherske Hradiste\", \"owner_count\": 44}, {\"district_name\": \"Hodonin\", \"owner_count\": 41}, {\"district_name\": \"Znojmo\", \"owner_count\": 39}, {\"district_name\": \"Jihlava\", \"owner_count\": 32}]"
+  },
+  "q_009": {
+    "sql": "SELECT c.client_id, c.gender, SUM(l.amount) AS total_loan_amount FROM disp d JOIN client c ON c.client_id = d.client_id JOIN loan l ON l.account_id = d.account_id WHERE d.type = 'OWNER' GROUP BY c.client_id, c.gender ORDER BY total_loan_amount DESC LIMIT 5",
+    "answer": "[{\"client_id\": 9340, \"gender\": \"M\", \"total_loan_amount\": 590820}, {\"client_id\": 10997, \"gender\": \"F\", \"total_loan_amount\": 566640}, {\"client_id\": 2823, \"gender\": \"F\", \"total_loan_amount\": 541200}, {\"client_id\": 981, \"gender\": \"M\", \"total_loan_amount\": 538500}, {\"client_id\": 3546, \"gender\": \"M\", \"total_loan_amount\": 504000}]"
+  },
+  "q_010": {
+    "sql": "SELECT COUNT(DISTINCT loan.loan_id) FROM loan JOIN account ON loan.account_id = account.account_id JOIN disp ON disp.account_id = account.account_id AND disp.type = 'OWNER' JOIN client ON disp.client_id = client.client_id JOIN district ON client.district_id = district.district_id WHERE loan.status = 'C' AND client.gender = 'M' AND district.A3 = 'north Bohemia'",
+    "answer": "COUNT(DISTINCT loan.loan_id): 18"
+  }
+}

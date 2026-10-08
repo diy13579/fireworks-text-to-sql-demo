@@ -1,0 +1,1306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Analysis of the Fireworks AI Field Engineer - Strategic Partnerships role and its alignment with the text-to-SQL take-home agent.">
+  <title>Fireworks AI Field Engineer | Role and SQL Agent Alignment</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #5e687b;
+      --line: #dce3ec;
+      --surface: #ffffff;
+      --surface-alt: #f5f7fa;
+      --navy: #111d3b;
+      --blue: #3157d5;
+      --violet: #6941c6;
+      --cyan: #0e7490;
+      --green: #087443;
+      --green-bg: #ecfdf3;
+      --amber: #a15c00;
+      --amber-bg: #fff8e6;
+      --red: #b42318;
+      --red-bg: #fef3f2;
+      --shadow: 0 16px 40px rgba(20, 32, 57, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: #edf1f6;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height: 1.58;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    a:hover {
+      color: var(--violet);
+    }
+
+    code {
+      padding: 0.12rem 0.38rem;
+      border: 1px solid #d8e0eb;
+      border-radius: 6px;
+      background: #f4f7fb;
+      color: #293f75;
+      font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      font-size: 0.88em;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 58px 24px 88px;
+      color: #fff;
+      background:
+        radial-gradient(circle at 82% 13%, rgba(110, 231, 255, 0.2), transparent 28%),
+        radial-gradient(circle at 12% 92%, rgba(168, 85, 247, 0.24), transparent 34%),
+        linear-gradient(135deg, #101a35 0%, #223f99 58%, #5133a8 100%);
+    }
+
+    .hero-inner,
+    main,
+    .footer-inner {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #a5e8ff;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(2.15rem, 5vw, 4rem);
+      line-height: 1.06;
+      letter-spacing: -0.035em;
+    }
+
+    .hero-copy {
+      max-width: 820px;
+      margin: 20px 0 0;
+      color: #e2eaff;
+      font-size: 1.1rem;
+    }
+
+    .hero-meta,
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .hero-meta {
+      margin-top: 26px;
+    }
+
+    .hero-pill,
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 750;
+    }
+
+    .hero-pill {
+      padding: 7px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    main {
+      position: relative;
+      margin-top: -42px;
+      padding: 0 24px 64px;
+    }
+
+    .toc,
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin-bottom: 22px;
+      padding: 17px 22px;
+    }
+
+    .toc a {
+      color: #344159;
+      font-size: 0.87rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--blue);
+    }
+
+    .card {
+      margin-bottom: 22px;
+      padding: 30px;
+      overflow: hidden;
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.45rem, 3vw, 1.85rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+      line-height: 1.32;
+    }
+
+    h4 {
+      margin: 20px 0 8px;
+      font-size: 0.98rem;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    ul,
+    ol {
+      margin: 10px 0 0;
+      padding-left: 1.2rem;
+    }
+
+    li + li {
+      margin-top: 7px;
+    }
+
+    .section-kicker {
+      margin: 0 0 7px;
+      color: var(--blue);
+      font-size: 0.75rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 930px;
+      color: #354058;
+      font-size: 1.03rem;
+    }
+
+    .muted,
+    .evidence {
+      color: var(--muted);
+    }
+
+    .evidence {
+      margin-top: 10px;
+      font-size: 0.83rem;
+    }
+
+    .grid-2,
+    .grid-3,
+    .metric-grid,
+    .split {
+      display: grid;
+      gap: 15px;
+    }
+
+    .grid-2,
+    .split {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3,
+    .metric-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .metric,
+    .concept,
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-alt);
+    }
+
+    .metric {
+      min-height: 118px;
+      padding: 20px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--blue);
+      font-size: 1.65rem;
+      line-height: 1.1;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .concept,
+    .mini-card {
+      padding: 20px;
+    }
+
+    .concept {
+      border-top: 4px solid var(--blue);
+    }
+
+    .concept:nth-child(2n) {
+      border-top-color: var(--violet);
+    }
+
+    .concept:nth-child(3n) {
+      border-top-color: var(--cyan);
+    }
+
+    .concept p,
+    .mini-card p {
+      margin: 0;
+      color: #4e5a70;
+      font-size: 0.92rem;
+    }
+
+    .tag-row {
+      margin-top: 14px;
+    }
+
+    .tag {
+      padding: 5px 9px;
+      border: 1px solid #d9e2f3;
+      background: #f7f9fd;
+      color: #384867;
+    }
+
+    .callout {
+      margin-top: 18px;
+      padding: 18px 20px;
+      border-left: 5px solid var(--blue);
+      border-radius: 10px;
+      background: #eef4ff;
+    }
+
+    .callout strong {
+      color: #1f3d92;
+    }
+
+    .callout.warning {
+      border-left-color: var(--amber);
+      background: var(--amber-bg);
+    }
+
+    .callout.warning strong {
+      color: var(--amber);
+    }
+
+    .callout.success {
+      border-left-color: var(--green);
+      background: var(--green-bg);
+    }
+
+    .callout.success strong {
+      color: var(--green);
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      align-items: stretch;
+      gap: 24px;
+      margin: 24px 0 8px;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 132px;
+      padding: 18px 15px;
+      border: 1px solid #cad5e6;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #fff, #f6f8fb);
+    }
+
+    .flow-step:not(:last-child)::after {
+      position: absolute;
+      top: 50%;
+      right: -20px;
+      color: #7a8db0;
+      content: "\2192";
+      font-size: 1.35rem;
+      font-weight: 800;
+      transform: translateY(-50%);
+    }
+
+    .step-number {
+      display: inline-grid;
+      width: 26px;
+      height: 26px;
+      margin-bottom: 10px;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.76rem;
+      font-weight: 850;
+    }
+
+    .flow-step strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.92rem;
+    }
+
+    .flow-step small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr 1.2fr 1fr;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .layer {
+      padding: 18px;
+      border: 1px solid #cfd8e7;
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .layer:nth-child(1) {
+      border-top: 4px solid var(--cyan);
+    }
+
+    .layer:nth-child(2) {
+      border-top: 4px solid var(--blue);
+    }
+
+    .layer:nth-child(3) {
+      border-top: 4px solid var(--violet);
+    }
+
+    .layer:nth-child(4) {
+      border-top: 4px solid var(--green);
+    }
+
+    .layer-label {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .layer ul {
+      color: #465168;
+      font-size: 0.86rem;
+    }
+
+    .loop {
+      margin-top: 15px;
+      padding: 13px 16px;
+      border: 1px dashed #9eaed0;
+      border-radius: 12px;
+      background: #f7f9fd;
+      color: #475572;
+      font-size: 0.88rem;
+      text-align: center;
+    }
+
+    .table-wrap {
+      margin-top: 18px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: 0.87rem;
+    }
+
+    th,
+    td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f4f7fb;
+      color: #33405a;
+      font-size: 0.74rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .status {
+      display: inline-flex;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .strong {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+
+    .partial {
+      background: var(--amber-bg);
+      color: var(--amber);
+    }
+
+    .gap {
+      background: var(--red-bg);
+      color: var(--red);
+    }
+
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .phase {
+      position: relative;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-alt);
+    }
+
+    .phase b {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--blue);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .phase p {
+      margin: 0;
+      color: #4e5a70;
+      font-size: 0.86rem;
+    }
+
+    .quote {
+      margin: 18px 0 0;
+      padding: 22px;
+      border: 1px solid #d9d2f4;
+      border-radius: 14px;
+      background: #f7f5ff;
+      color: #3e3767;
+      font-size: 1rem;
+      font-weight: 650;
+    }
+
+    .sources {
+      color: #49566c;
+      font-size: 0.88rem;
+    }
+
+    .sources li + li {
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 26px 24px 38px;
+      background: var(--navy);
+      color: #bcc7dd;
+      font-size: 0.82rem;
+    }
+
+    footer a {
+      color: #bcd7ff;
+    }
+
+    @media (max-width: 960px) {
+      .grid-3,
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .flow {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .flow-step:not(:last-child)::after {
+        top: auto;
+        right: 50%;
+        bottom: -16px;
+        content: "\2193";
+        transform: translateX(50%);
+      }
+
+      .architecture,
+      .roadmap {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .hero {
+        padding: 42px 20px 76px;
+      }
+
+      main {
+        padding-inline: 14px;
+      }
+
+      .card {
+        padding: 22px 18px;
+        border-radius: 15px;
+      }
+
+      .grid-2,
+      .grid-3,
+      .metric-grid,
+      .split,
+      .architecture,
+      .roadmap {
+        grid-template-columns: 1fr;
+      }
+
+      th,
+      td {
+        min-width: 150px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .hero {
+        padding-block: 30px 48px;
+        print-color-adjust: exact;
+      }
+
+      main {
+        margin-top: -24px;
+      }
+
+      .toc {
+        display: none;
+      }
+
+      .card {
+        break-inside: avoid;
+        box-shadow: none;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Role analysis and solution alignment</p>
+      <h1>AI Field Engineer: from strategic partnerships to a production text-to-SQL agent</h1>
+      <p class="hero-copy">
+        A concise analysis of the Fireworks AI Field Engineer - Strategic Partnerships
+        role, its operating model and architecture themes, and how this take-home SQL
+        agent demonstrates the same skills - plus the gaps to close before presenting it
+        as an enterprise reference architecture.
+      </p>
+      <div class="hero-meta">
+        <span class="hero-pill">Fireworks AI</span>
+        <span class="hero-pill">Strategic partnerships</span>
+        <span class="hero-pill">Azure ecosystem</span>
+        <span class="hero-pill">Inference and evaluation</span>
+        <span class="hero-pill">Text-to-SQL agent</span>
+        <span class="hero-pill">Analyzed October 7, 2026</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <nav class="toc" aria-label="Report sections">
+      <a href="#summary">Executive summary</a>
+      <a href="#concepts">Role concepts</a>
+      <a href="#workflow">Role workflow</a>
+      <a href="#role-architecture">Role architecture</a>
+      <a href="#agent">SQL agent</a>
+      <a href="#mapping">Alignment matrix</a>
+      <a href="#target">Target architecture</a>
+      <a href="#recommendations">Recommendations</a>
+      <a href="#sources">Sources</a>
+    </nav>
+
+    <section class="card" id="summary">
+      <p class="section-kicker">Executive summary</p>
+      <h2>The role is a builder, systems architect, performance engineer, and trusted advisor in one</h2>
+      <p class="lead">
+        This is not a conventional solutions-engineering role centered on demos. The
+        description repeatedly emphasizes shipping code in partner environments,
+        co-owning production outcomes, measuring realistic workloads, tuning the model
+        serving path, and converting field evidence into both product roadmap input and
+        reusable partner assets.
+      </p>
+
+      <div class="metric-grid">
+        <div class="metric">
+          <strong>Build</strong>
+          <span>Joint POCs, MVPs, integrations, reference architectures, and production code.</span>
+        </div>
+        <div class="metric">
+          <strong>Measure</strong>
+          <span>Latency, throughput, cost, quality, load behavior, and production-grade evaluation.</span>
+        </div>
+        <div class="metric">
+          <strong>Scale</strong>
+          <span>Turn one successful Microsoft/Foundry pattern into repeatable partner motions.</span>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <strong>Bottom line for the SQL agent:</strong>
+        the take-home is highly relevant because it is a compact field-engineering
+        engagement: discover a customer need, ground a model in customer data, build an
+        executable POC, benchmark multiple models, expose latency/cost/quality trade-offs,
+        add safety controls, document limitations, and communicate next steps.
+      </div>
+    </section>
+
+    <section class="card" id="concepts">
+      <p class="section-kicker">Concepts in the job description</p>
+      <h2>Six recurring themes define the role</h2>
+      <div class="grid-3">
+        <article class="concept">
+          <h3>1. Partner technical ownership</h3>
+          <p>
+            Own the technical relationship across strategic partner field teams,
+            partner-aligned ISVs, systems integrators, and shared enterprise accounts.
+            Success depends on trust, not only technical correctness.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Co-sell</span>
+            <span class="tag">Discovery</span>
+            <span class="tag">Trusted advisor</span>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h3>2. Joint delivery</h3>
+          <p>
+            Build inside a partner's codebase and constraints. Deliver end-to-end POCs
+            and MVPs that can become repeatable integration patterns and production
+            deployments.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Python</span>
+            <span class="tag">POC to production</span>
+            <span class="tag">Reference architecture</span>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h3>3. Inference systems engineering</h3>
+          <p>
+            Understand model serving beyond an API call: batching, model shapes,
+            quantization, structured output, function calling, reliability, and the
+            latency/throughput trade space.
+          </p>
+          <div class="tag-row">
+            <span class="tag">vLLM</span>
+            <span class="tag">SGLang</span>
+            <span class="tag">TensorRT-LLM</span>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h3>4. Model strategy and training</h3>
+          <p>
+            Help customers choose model families and decide whether prompting, SFT,
+            DPO, LoRA, or RFT is appropriate. Balance compute cost, iteration speed,
+            and quality targets.
+          </p>
+          <div class="tag-row">
+            <span class="tag">SFT / DPO / RFT</span>
+            <span class="tag">LoRA</span>
+            <span class="tag">Model selection</span>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h3>5. Rigorous evaluation</h3>
+          <p>
+            Establish realistic baselines and measure production behavior rather than
+            relying on leaderboard scores. The role explicitly calls out benchmark
+            gaming and production-quality metrics.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Load tests</span>
+            <span class="tag">p99 latency</span>
+            <span class="tag">Cost and quality</span>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h3>6. Enterprise AI integration</h3>
+          <p>
+            Place Fireworks correctly within Azure Foundry, Azure OpenAI Service,
+            Azure ML, AKS, and Entra/RBAC patterns while addressing security,
+            compliance, platform, and application stakeholders.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Azure Foundry</span>
+            <span class="tag">AKS</span>
+            <span class="tag">Entra / RBAC</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="card" id="workflow">
+      <p class="section-kicker">Operating workflow</p>
+      <h2>The job describes a repeatable field-to-product loop</h2>
+      <div class="flow" aria-label="Field engineering workflow">
+        <div class="flow-step">
+          <span class="step-number">1</span>
+          <strong>Discover</strong>
+          <small>Map stakeholders, workload, data, security constraints, target outcomes, and success metrics.</small>
+        </div>
+        <div class="flow-step">
+          <span class="step-number">2</span>
+          <strong>Co-design</strong>
+          <small>Choose model, integration pattern, serving path, evaluation plan, and partner responsibilities.</small>
+        </div>
+        <div class="flow-step">
+          <span class="step-number">3</span>
+          <strong>Build</strong>
+          <small>Ship the joint POC or MVP in the customer's actual codebase, infrastructure, and constraints.</small>
+        </div>
+        <div class="flow-step">
+          <span class="step-number">4</span>
+          <strong>Validate and tune</strong>
+          <small>Run realistic quality, latency, throughput, cost, reliability, and load evaluations.</small>
+        </div>
+        <div class="flow-step">
+          <span class="step-number">5</span>
+          <strong>Scale and feed back</strong>
+          <small>Productionize, document the pattern, enable partner teams, and route field gaps into the roadmap.</small>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Important distinction:</strong>
+        the workflow is iterative. Evaluation can force a new model, prompt, serving
+        configuration, data strategy, or fine-tuning choice. Production signals then
+        become product feedback and reusable partner guidance.
+      </div>
+    </section>
+
+    <section class="card" id="role-architecture">
+      <p class="section-kicker">Architecture implied by the role</p>
+      <h2>Fireworks is the specialized inference and fine-tuning layer inside a broader partner stack</h2>
+      <p class="lead">
+        The description does not prescribe one fixed topology. It describes an
+        architectural position: Fireworks should integrate with partner cloud,
+        identity, data, application, and operations layers, while providing optimized
+        model inference, training, evaluation, and model-family choice.
+      </p>
+
+      <div class="architecture" aria-label="Role architecture">
+        <article class="layer">
+          <div class="layer-label">Enterprise edge</div>
+          <h3>Users and stakeholders</h3>
+          <ul>
+            <li>Application users</li>
+            <li>IT, security, compliance</li>
+            <li>ML and platform teams</li>
+            <li>Business owners</li>
+          </ul>
+        </article>
+        <article class="layer">
+          <div class="layer-label">Strategic partner</div>
+          <h3>Azure and partner platform</h3>
+          <ul>
+            <li>Azure Foundry / Azure ML</li>
+            <li>AKS and application runtime</li>
+            <li>Entra identity and RBAC</li>
+            <li>Data, networking, observability</li>
+          </ul>
+        </article>
+        <article class="layer">
+          <div class="layer-label">Fireworks</div>
+          <h3>Specialized intelligence</h3>
+          <ul>
+            <li>Model inference and routing</li>
+            <li>Fine-tuning pipelines</li>
+            <li>Structured output / tool use</li>
+            <li>Optimized model serving</li>
+          </ul>
+        </article>
+        <article class="layer">
+          <div class="layer-label">Workload</div>
+          <h3>Customer systems</h3>
+          <ul>
+            <li>Agents and applications</li>
+            <li>Enterprise data sources</li>
+            <li>Evaluation datasets</li>
+            <li>Production telemetry</li>
+          </ul>
+        </article>
+      </div>
+      <div class="loop">
+        Production telemetry and partner feedback &rarr; evaluation and product gaps
+        &rarr; roadmap, model, serving, and enablement improvements &rarr; reusable
+        reference architecture
+      </div>
+    </section>
+
+    <section class="card" id="agent">
+      <p class="section-kicker">Current take-home architecture</p>
+      <h2>The SQL agent is a small but credible custom tool-use pipeline</h2>
+      <p class="lead">
+        The implementation turns a natural-language request into a constrained database
+        tool call. It grounds the model in live schema metadata and supplied semantic
+        documentation, requires structured output, validates the SQL safety envelope,
+        executes locally in read-only mode, and records timing and model usage.
+      </p>
+
+      <div class="flow" aria-label="Current SQL agent workflow">
+        <div class="flow-step">
+          <span class="step-number">1</span>
+          <strong>Question and context</strong>
+          <small>CLI request plus a bounded history of recent successful question/SQL pairs.</small>
+        </div>
+        <div class="flow-step">
+          <span class="step-number">2</span>
+          <strong>Schema grounding</strong>
+          <small>Live SQLite schema plus CSV column meaning and encoded-value documentation.</small>
+        </div>
+        <div class="flow-step">
+          <span class="step-number">3</span>
+          <strong>Fireworks inference</strong>
+          <small>OpenAI-compatible request with prompt-cache affinity and Pydantic JSON schema output.</small>
+        </div>
+        <div class="flow-step">
+          <span class="step-number">4</span>
+          <strong>Guard and execute</strong>
+          <small>Single SELECT/WITH check, SQLite query-only mode, execution, and one error-driven repair.</small>
+        </div>
+        <div class="flow-step">
+          <span class="step-number">5</span>
+          <strong>Answer and measure</strong>
+          <small>Return SQL, rows, readable answer, end-to-end latency, SQLite time, cache, and token metrics.</small>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="mini-card">
+          <h3>What <code>src/utils.py</code> contributes</h3>
+          <ul>
+            <li><code>load_db</code>: reliable SQLite connection setup and foreign keys.</li>
+            <li><code>query_db</code>: parameter-aware execution to DataFrame or dictionaries.</li>
+            <li><code>get_schema</code>: live table and column introspection.</li>
+            <li><code>load_column_descriptions</code>: customer-supplied semantic metadata.</li>
+            <li><code>get_rag_corpus</code>: retrieval-ready records for schemas too large to place fully in the prompt.</li>
+          </ul>
+          <p class="evidence">
+            Evidence: <a href="./src/utils.py">src/utils.py</a>, especially lines 12-153.
+          </p>
+        </article>
+        <article class="mini-card">
+          <h3>What the rest of the agent contributes</h3>
+          <ul>
+            <li>Pydantic contract for one executable SQL statement.</li>
+            <li>Prompt grounding, value semantics, join guidance, and follow-up memory.</li>
+            <li>Read-only enforcement and a bounded self-repair loop.</li>
+            <li>Model, cache, token, TTFT, server processing, and local execution telemetry.</li>
+            <li>Execution-based evaluation, multi-model comparison, and customer-facing findings.</li>
+          </ul>
+          <p class="evidence">
+            Evidence: <a href="./src/agent.py">src/agent.py</a>,
+            <a href="./src/evaluate.py">src/evaluate.py</a>,
+            <a href="./README.md">README.md</a>, and
+            <a href="./CUSTOMER_EMAIL.md">CUSTOMER_EMAIL.md</a>.
+          </p>
+        </article>
+      </div>
+
+      <div class="callout warning">
+        <strong>Do not overstate it:</strong>
+        this is a local SQLite POC, not yet an Azure/AKS deployment or a production
+        multi-tenant service. It demonstrates the engineering method and several
+        inference concerns, but not direct vLLM/SGLang operation, quantization,
+        Kubernetes, Entra/RBAC, or fine-tuning.
+      </div>
+    </section>
+
+    <section class="card" id="mapping">
+      <p class="section-kicker">Role-to-project alignment</p>
+      <h2>What is directly demonstrated, partially demonstrated, and still missing</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Job expectation</th>
+              <th>SQL agent evidence</th>
+              <th>Assessment</th>
+              <th>How to present or improve it</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Build end-to-end POCs and MVPs</td>
+              <td>Working Python CLI, Fireworks API integration, local database tool, tests, evaluator, and delivery artifacts.</td>
+              <td><span class="status strong">Strong</span></td>
+              <td>Frame it as a complete discovery-to-evidence POC, not just a prompt demo.</td>
+            </tr>
+            <tr>
+              <td>Production software with customers</td>
+              <td>Typed result contracts, explicit errors, safety checks, repair bounds, repeatable setup, and customer communication.</td>
+              <td><span class="status partial">Partial</span></td>
+              <td>Add a service API, authentication, deployment manifest, observability, concurrency controls, and an operating runbook.</td>
+            </tr>
+            <tr>
+              <td>LLM inference trade-offs</td>
+              <td>Multi-model quality/latency/cost comparison; prompt caching; token, TTFT, server time, repair, and SQLite timing.</td>
+              <td><span class="status strong">Strong</span></td>
+              <td>Lead with the GLM/Kimi/DeepSeek/GPT-OSS trade-off, including why the fastest model still needs semantic validation.</td>
+            </tr>
+            <tr>
+              <td>Structured outputs and function calling</td>
+              <td>Pydantic JSON schema produces one SQL tool payload, followed by deterministic validation and execution.</td>
+              <td><span class="status strong">Strong</span></td>
+              <td>Describe SQL execution as custom tool use; distinguish JSON-schema output from provider-native function calling.</td>
+            </tr>
+            <tr>
+              <td>Rigorous evaluation</td>
+              <td>Result-equivalence scoring, independent benchmark cases, multiple runs, per-tier accuracy, latency percentiles, cost, and failure analysis.</td>
+              <td><span class="status strong">Strong</span></td>
+              <td>Emphasize executable outcomes and repeated failure patterns rather than a single headline score.</td>
+            </tr>
+            <tr>
+              <td>Realistic load tests</td>
+              <td>Single-request model benchmarks and repeated SQLite execution measurements exist; concurrent end-to-end load is not shown.</td>
+              <td><span class="status partial">Partial</span></td>
+              <td>Add cold/warm/concurrent tests, p50/p95/p99, throughput, rate-limit behavior, and saturation analysis.</td>
+            </tr>
+            <tr>
+              <td>Model selection strategy</td>
+              <td>Evidence-based choice between quality, latency, cache behavior, retirement risk, and price.</td>
+              <td><span class="status strong">Strong</span></td>
+              <td>Turn the comparison into a routing policy: fast default, semantic validator, quality fallback.</td>
+            </tr>
+            <tr>
+              <td>Fine-tuning strategy</td>
+              <td>The plan identifies data to collect and when tuning becomes worthwhile, but no SFT/LoRA/DPO/RFT pipeline is implemented.</td>
+              <td><span class="status partial">Partial</span></td>
+              <td>Present a maturity decision: improve grounding/evals first; fine-tune after a representative failure corpus exists.</td>
+            </tr>
+            <tr>
+              <td>Agentic frameworks / custom tool use</td>
+              <td>Custom agent loop: grounding, structured action generation, SQL tool execution, repair, memory, and final answer.</td>
+              <td><span class="status strong">Strong</span></td>
+              <td>Explain why a lightweight custom loop reduces latency and operational complexity versus a large framework.</td>
+            </tr>
+            <tr>
+              <td>Latency and reliability shape agent behavior</td>
+              <td>One-call normal path, prompt caching, bounded repair, explicit latency measurement, and documented quality fallback need.</td>
+              <td><span class="status strong">Strong</span></td>
+              <td>Show that retries improve recoverability but increase tail latency, so semantic validation and routing must be selective.</td>
+            </tr>
+            <tr>
+              <td>Azure AI stack and Kubernetes</td>
+              <td>No direct Azure Foundry, Azure ML, Azure OpenAI, AKS, Entra, RBAC, or Kubernetes implementation in the POC.</td>
+              <td><span class="status gap">Gap</span></td>
+              <td>Add an Azure reference deployment and state clearly where Fireworks complements rather than duplicates partner services.</td>
+            </tr>
+            <tr>
+              <td>Serving frameworks and quantization</td>
+              <td>The agent consumes managed Fireworks inference; it does not operate vLLM, SGLang, TensorRT-LLM, or quantization settings.</td>
+              <td><span class="status gap">Gap</span></td>
+              <td>Do not claim this experience from the POC. Connect observed API behavior to a future serving benchmark plan.</td>
+            </tr>
+            <tr>
+              <td>Security and enterprise governance</td>
+              <td>Read-only mode, statement restriction, and no committed API key are useful foundations; identity and tenant isolation are absent.</td>
+              <td><span class="status partial">Partial</span></td>
+              <td>Add Entra auth, least-privilege DB identity, per-user schema filtering, AST policy, timeouts, audit logs, and PII controls.</td>
+            </tr>
+            <tr>
+              <td>Technical content and partner enablement</td>
+              <td>README, implementation plan, readiness report, result artifacts, and a customer-facing email explain the design and evidence.</td>
+              <td><span class="status strong">Strong</span></td>
+              <td>Convert the work into a concise reference architecture and a reproducible partner workshop.</td>
+            </tr>
+            <tr>
+              <td>Field feedback to roadmap</td>
+              <td>The repeated Prague semantic error is translated into semantic checks, fallback routing, and unseen-schema evaluation proposals.</td>
+              <td><span class="status strong">Strong</span></td>
+              <td>Use this as the clearest example of turning a field failure into product and architecture requirements.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" id="target">
+      <p class="section-kicker">Production reference architecture</p>
+      <h2>How the SQL agent could become a strategic-partner architecture</h2>
+      <p class="lead">
+        The most direct role-aligned extension is to preserve the lightweight agent
+        core while adding enterprise identity, policy enforcement, model routing,
+        observability, and a continuous evaluation loop around it.
+      </p>
+
+      <div class="architecture" aria-label="Target production SQL agent architecture">
+        <article class="layer">
+          <div class="layer-label">Experience</div>
+          <h3>Partner application</h3>
+          <ul>
+            <li>Web, copilot, or API client</li>
+            <li>Entra authentication</li>
+            <li>Tenant and user context</li>
+            <li>Human confirmation for risky actions</li>
+          </ul>
+        </article>
+        <article class="layer">
+          <div class="layer-label">Control plane</div>
+          <h3>Agent service on Azure</h3>
+          <ul>
+            <li>AKS or managed app runtime</li>
+            <li>RBAC-aware schema retrieval</li>
+            <li>Prompt/version registry</li>
+            <li>Rate limits, timeouts, audit</li>
+          </ul>
+        </article>
+        <article class="layer">
+          <div class="layer-label">Intelligence</div>
+          <h3>Fireworks model path</h3>
+          <ul>
+            <li>Fast generation model</li>
+            <li>Structured SQL output</li>
+            <li>Semantic/risk validator</li>
+            <li>Quality fallback and repair</li>
+          </ul>
+        </article>
+        <article class="layer">
+          <div class="layer-label">Data plane</div>
+          <h3>Governed data access</h3>
+          <ul>
+            <li>Read-only database identity</li>
+            <li>AST and row/column policy</li>
+            <li>Query budget and row limit</li>
+            <li>Warehouse/query telemetry</li>
+          </ul>
+        </article>
+      </div>
+      <div class="loop">
+        Traces + accepted SQL + execution failures + user corrections + cost/latency
+        &rarr; offline regression suite &rarr; prompt/router changes &rarr; only then
+        representative-data SFT/LoRA/RFT experiments
+      </div>
+
+      <div class="split">
+        <article class="mini-card">
+          <h3>Normal path</h3>
+          <ol>
+            <li>Authenticate user and resolve tenant permissions.</li>
+            <li>Retrieve only authorized schema and business semantics.</li>
+            <li>Generate structured SQL with the low-latency Fireworks route.</li>
+            <li>Run syntax, AST, policy, and semantic checks.</li>
+            <li>Execute with a read-only identity, timeout, and row limit.</li>
+            <li>Return answer, SQL provenance, and trace metrics.</li>
+          </ol>
+        </article>
+        <article class="mini-card">
+          <h3>Exception paths</h3>
+          <ol>
+            <li>Syntax/execution failure: one bounded repair with exact error.</li>
+            <li>Semantic uncertainty: clarify with the user or invoke a stronger validator.</li>
+            <li>High-risk query: require confirmation or deny by policy.</li>
+            <li>Model/provider degradation: circuit break and route to an approved fallback.</li>
+            <li>Regression: quarantine the release and add the trace to evaluation.</li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <section class="card" id="recommendations">
+      <p class="section-kicker">Reflection and next steps</p>
+      <h2>What the job description should change about the way this agent is presented</h2>
+      <div class="roadmap">
+        <article class="phase">
+          <b>Now: tell the story</b>
+          <p>
+            Present the agent as a field-engineering case study: customer problem,
+            architecture decision, measured trade-off, failure, feedback, and next
+            production decision.
+          </p>
+        </article>
+        <article class="phase">
+          <b>Next: harden the agent</b>
+          <p>
+            Add semantic checks, parser/AST policy, query timeouts and row limits,
+            quality fallback, audit logs, concurrency tests, and regression CI.
+          </p>
+        </article>
+        <article class="phase">
+          <b>Then: partner deployment</b>
+          <p>
+            Package an Azure reference deployment with Entra/RBAC, secret management,
+            observability, network controls, tenant isolation, and a partner runbook.
+          </p>
+        </article>
+        <article class="phase">
+          <b>Later: training loop</b>
+          <p>
+            Collect representative reviewed traces first. Compare prompt, retrieval,
+            routing, and LoRA/SFT/RFT options against held-out schemas before tuning.
+          </p>
+        </article>
+      </div>
+
+      <h3 style="margin-top: 28px;">High-value talking points for this role</h3>
+      <div class="grid-2">
+        <article class="mini-card">
+          <h3>From agent to role</h3>
+          <ul>
+            <li>
+              "I optimized the full customer outcome, not only model accuracy: quality,
+              latency, cache behavior, inference cost, failure modes, and operability."
+            </li>
+            <li>
+              "The fastest model reached the target but repeated a semantic error. I
+              translated that field signal into validation, routing, and evaluation requirements."
+            </li>
+            <li>
+              "I chose a custom tool-use loop because the small workflow did not justify
+              framework overhead; the choice is reversible when orchestration complexity grows."
+            </li>
+          </ul>
+        </article>
+        <article class="mini-card">
+          <h3>From role to agent</h3>
+          <ul>
+            <li>
+              Add enterprise architecture evidence: Azure identity, AKS/runtime,
+              governance, observability, and a least-privilege data path.
+            </li>
+            <li>
+              Add serving evidence: cold/warm/concurrent tests and explicit p50/p95/p99,
+              throughput, error budget, and fallback behavior.
+            </li>
+            <li>
+              Separate current evidence from future design so the story remains
+              technically credible with partner engineers and executives.
+            </li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="quote">
+        The strongest connection is not "I built a SQL chatbot." It is: "I built and
+        evaluated a customer-specific AI system, found the boundary between a fast POC
+        and a production architecture, and converted measured failures into a concrete
+        joint roadmap."
+      </div>
+    </section>
+
+    <section class="card" id="sources">
+      <p class="section-kicker">Sources and scope</p>
+      <h2>Evidence used for this analysis</h2>
+      <ol class="sources">
+        <li>
+          <a href="https://jobs.ashbyhq.com/fireworks/4a5dbfe4-b0d5-4394-a94b-42345fb425b4">
+            Fireworks: AI Field Engineer - Strategic Partnerships
+          </a>
+          - primary source for role, responsibilities, qualifications, technologies,
+          compensation range, and partner context. Accessed October 7, 2026.
+        </li>
+        <li>
+          <a href="./src/utils.py">src/utils.py</a> - database access, schema
+          introspection, column-documentation loading, and retrieval corpus helpers.
+        </li>
+        <li>
+          <a href="./src/agent.py">src/agent.py</a> - Fireworks inference, structured
+          SQL generation, prompt caching, conversation context, read-only guardrails,
+          repair, and metrics.
+        </li>
+        <li>
+          <a href="./README.md">README.md</a> and
+          <a href="./IMPLEMENTATION_PLAN.md">IMPLEMENTATION_PLAN.md</a> - system
+          architecture, evaluation design, model comparison, limitations, and post-training direction.
+        </li>
+        <li>
+          <a href="./CUSTOMER_EMAIL.md">CUSTOMER_EMAIL.md</a> - customer-facing
+          benchmark results, cost/latency findings, semantic failure analysis, and proposed production spike.
+        </li>
+      </ol>
+      <div class="callout warning">
+        <strong>Scope note:</strong>
+        "Current" claims describe artifacts visible in this take-home. "Target" items
+        are recommendations inferred from the job description and are not represented
+        as already implemented.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      Prepared as a standalone role-and-project alignment report. No external scripts,
+      fonts, or stylesheets are required; the file can be opened locally or printed to PDF.
+    </div>
+  </footer>
+</body>
+</html>

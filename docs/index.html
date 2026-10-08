@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://api.fireworks.ai https://cdnjs.cloudflare.com; worker-src 'self' blob:; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none';"
+  >
+  <meta name="referrer" content="no-referrer">
+  <title>Fireworks Text-to-SQL · Governed Demo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <div>
+        <p class="eyebrow">Fireworks AI · Text-to-SQL</p>
+        <h1>Governed database questions, from prompt to bounded result.</h1>
+        <p class="lede">
+          A browser demonstration of schema grounding, semantic checks, read-only
+          SQL execution, and measurable inference behavior.
+        </p>
+      </div>
+      <div class="header-status" aria-label="Demo status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Browser-local SQLite</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tab-nav" aria-label="Dashboard sections">
+    <div class="shell tab-list" role="tablist">
+      <button class="tab active" role="tab" aria-selected="true" aria-controls="overview-panel" id="overview-tab" data-tab="overview">Overview</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="demo-panel" id="demo-tab" data-tab="demo">Live Demo</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="evidence-panel" id="evidence-tab" data-tab="evidence">Evidence</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="architecture-panel" id="architecture-tab" data-tab="architecture">Architecture</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="controls-panel" id="controls-tab" data-tab="controls">Controls</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="roadmap-panel" id="roadmap-tab" data-tab="roadmap">Roadmap</button>
+    </div>
+  </nav>
+
+  <main id="main" class="shell">
+    <section class="panel active" id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" data-panel="overview">
+      <div class="section-heading">
+        <p class="eyebrow">What this demonstrates</p>
+        <h2>A transparent text-to-SQL pipeline—not a black box.</h2>
+        <p>
+          The model proposes a logical plan and SQL. Deterministic browser code
+          checks ambiguity, concepts, statement safety, execution time, rows, and
+          bytes before showing a result.
+        </p>
+      </div>
+
+      <div class="metric-grid" aria-label="Project facts">
+        <article class="metric-card">
+          <strong>26</strong>
+          <span>credential-free controls tests</span>
+        </article>
+        <article class="metric-card">
+          <strong>8</strong>
+          <span>documented financial tables</span>
+        </article>
+        <article class="metric-card">
+          <strong>1.06M</strong>
+          <span>rows in the largest table</span>
+        </article>
+        <article class="metric-card">
+          <strong>0</strong>
+          <span>API keys stored by this page</span>
+        </article>
+      </div>
+
+      <div class="step-grid">
+        <article class="step-card"><span>01</span><h3>Plan</h3><p>Turn the question into explicit grain, tables, columns, concepts, ambiguities, and confidence.</p></article>
+        <article class="step-card"><span>02</span><h3>Generate</h3><p>Ask a current Fireworks model for one structured, read-only SQLite query.</p></article>
+        <article class="step-card"><span>03</span><h3>Verify</h3><p>Check the plan against approved schema objects and business-concept fields.</p></article>
+        <article class="step-card"><span>04</span><h3>Bound</h3><p>Apply API timeout, SQL timeout, row cap, byte cap, and one repair attempt.</p></article>
+        <article class="step-card"><span>05</span><h3>Execute</h3><p>Run an in-memory copy of the public demonstration database in a Web Worker.</p></article>
+        <article class="step-card"><span>06</span><h3>Explain</h3><p>Show SQL, confidence, results, quality match, latency, usage, and warnings.</p></article>
+      </div>
+
+      <div class="callout">
+        <div>
+          <h3>Try the end-to-end workflow</h3>
+          <p>Use your own Fireworks key. It remains in this browser tab and is sent directly to Fireworks.</p>
+        </div>
+        <button class="button primary" type="button" data-open-tab="demo">Open Live Demo</button>
+      </div>
+    </section>
+
+    <section class="panel" id="demo-panel" role="tabpanel" aria-labelledby="demo-tab" data-panel="demo" hidden>
+      <div class="section-heading">
+        <p class="eyebrow">Interactive workflow</p>
+        <h2>Ask the bundled financial database.</h2>
+        <p>
+          Your API key is held only in the password field. The database and SQL
+          execution stay in your browser; GitHub never receives the key or query.
+        </p>
+      </div>
+
+      <div class="privacy-note" role="note">
+        <strong>Key handling:</strong>
+        no cookies, local storage, session storage, analytics, or server proxy.
+        Use a temporary key with an appropriate spending limit.
+      </div>
+
+      <div class="demo-layout">
+        <form class="card controls-card" id="queryForm">
+          <div class="field">
+            <label for="apiKey">Fireworks API key</label>
+            <div class="field-inline">
+              <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your key">
+              <button class="button secondary" id="clearKey" type="button">Clear</button>
+            </div>
+            <small>Sent only to <code>api.fireworks.ai</code>.</small>
+          </div>
+
+          <div class="field">
+            <label for="model">Model identifier</label>
+            <input id="model" list="modelOptions" value="accounts/fireworks/models/deepseek-v4p1-flash" spellcheck="false">
+            <datalist id="modelOptions">
+              <option value="accounts/fireworks/models/deepseek-v4p1-flash"></option>
+              <option value="accounts/fireworks/routers/glm-5p3-fast"></option>
+            </datalist>
+            <small>Use a currently supported Fireworks model with structured output.</small>
+          </div>
+
+          <div class="field">
+            <label for="questionSelect">Example question</label>
+            <select id="questionSelect">
+              <option value="">Loading questions…</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="question">Natural-language question</label>
+            <textarea id="question" rows="5" maxlength="2000" placeholder="How many bank accounts are located in the Prague region?"></textarea>
+          </div>
+
+          <div class="action-row">
+            <button class="button primary" id="runQuery" type="submit">Generate and run SQL</button>
+            <span class="inline-status" id="runStatus" aria-live="polite">Waiting for database…</span>
+          </div>
+        </form>
+
+        <aside class="card runtime-card">
+          <h3>Runtime limits</h3>
+          <dl class="limit-list">
+            <div><dt>Model deadline</dt><dd>20 seconds</dd></div>
+            <div><dt>SQL deadline</dt><dd>5 seconds</dd></div>
+            <div><dt>Rows displayed</dt><dd>100 maximum</dd></div>
+            <div><dt>Result bytes</dt><dd>1 MiB maximum</dd></div>
+            <div><dt>Repair attempts</dt><dd>1 maximum</dd></div>
+            <div><dt>Confidence floor</dt><dd>0.80</dd></div>
+          </dl>
+          <div class="db-state" id="dbState">
+            <span class="spinner" aria-hidden="true"></span>
+            Loading 68 MiB demo database…
+          </div>
+        </aside>
+      </div>
+
+      <section class="results-section" aria-live="polite">
+        <div class="result-header">
+          <div>
+            <p class="eyebrow">Latest run</p>
+            <h3 id="resultTitle">No query run yet</h3>
+          </div>
+          <span class="result-badge neutral" id="resultBadge">Ready</span>
+        </div>
+
+        <div class="result-metrics" id="resultMetrics" hidden>
+          <div><span>Confidence</span><strong id="metricConfidence">—</strong></div>
+          <div><span>Model</span><strong id="metricModel">—</strong></div>
+          <div><span>SQLite</span><strong id="metricSqlite">—</strong></div>
+          <div><span>Rows</span><strong id="metricRows">—</strong></div>
+          <div><span>Tokens</span><strong id="metricTokens">—</strong></div>
+          <div><span>Repair</span><strong id="metricRepair">—</strong></div>
+        </div>
+
+        <div class="result-grid">
+          <article class="card">
+            <div class="card-heading"><h3>Logical plan</h3></div>
+            <div class="empty-state" id="planOutput">The model plan will appear here.</div>
+          </article>
+          <article class="card">
+            <div class="card-heading">
+              <h3>Verified SQL</h3>
+              <button class="text-button" id="copySql" type="button" disabled>Copy</button>
+            </div>
+            <pre id="sqlOutput"><code>-- Generated SQL will appear here.</code></pre>
+          </article>
+        </div>
+
+        <article class="card table-card">
+          <div class="card-heading">
+            <h3>Bounded result</h3>
+            <span class="muted" id="resultWarning"></span>
+          </div>
+          <div class="table-wrap" id="tableOutput">
+            <p class="empty-state">Query results will appear here.</p>
+          </div>
+        </article>
+
+        <article class="card activity-card">
+          <div class="card-heading">
+            <h3>Session activity</h3>
+            <button class="text-button" id="clearActivity" type="button">Clear</button>
+          </div>
+          <ol id="activityLog" class="activity-log">
+            <li>No activity yet.</li>
+          </ol>
+        </article>
+      </section>
+    </section>
+
+    <section class="panel" id="evidence-panel" role="tabpanel" aria-labelledby="evidence-tab" data-panel="evidence" hidden>
+      <div class="section-heading">
+        <p class="eyebrow">Measured evidence</p>
+        <h2>Baseline results, clearly separated from production claims.</h2>
+        <p>
+          Historical benchmark artifacts remain useful for model selection, but
+          the ten public questions are not treated as held-out production evidence.
+        </p>
+      </div>
+
+      <div class="metric-grid" id="evidenceMetrics">
+        <article class="metric-card"><strong>26/26</strong><span>candidate and dashboard tests passing</span></article>
+        <article class="metric-card"><strong>28/30</strong><span>GLM fast repeated-run accuracy</span></article>
+        <article class="metric-card"><strong>0.716s</strong><span>combined GLM fast P50</span></article>
+        <article class="metric-card"><strong>5.811s</strong><span>combined GLM fast P95</span></article>
+      </div>
+
+      <article class="card">
+        <div class="card-heading">
+          <h3>Fireworks model evidence</h3>
+          <span class="muted">Historical PoC runs</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Model / run</th><th>Accuracy</th><th>P50</th><th>P95</th><th>Status</th></tr></thead>
+            <tbody id="benchmarkRows">
+              <tr><td colspan="5">Loading benchmark summary…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <div class="two-column">
+        <article class="card">
+          <h3>What is proven</h3>
+          <ul class="check-list">
+            <li>Credential-free safety and control tests pass.</li>
+            <li>Read-only execution, limits, cancellation, and pagination are enforced.</li>
+            <li>The known Prague region semantic mismatch is a regression test.</li>
+            <li>Concurrent service requests use isolated SQLite connections.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>What is not yet proven</h3>
+          <ul class="plain-list">
+            <li>Accuracy confidence intervals on representative held-out schemas.</li>
+            <li>Sustained P95/P99 under production-like concurrent traffic.</li>
+            <li>Live provider degradation and outage behavior.</li>
+            <li>Authorization escape rate in a deployed multi-tenant environment.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="architecture-panel" role="tabpanel" aria-labelledby="architecture-tab" data-panel="architecture" hidden>
+      <div class="section-heading">
+        <p class="eyebrow">System design</p>
+        <h2>Control plane and request plane are separate.</h2>
+      </div>
+
+      <div class="architecture-flow" aria-label="Runtime architecture">
+        <div class="arch-node"><strong>Question</strong><span>Browser or service request</span></div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-node"><strong>Authorized context</strong><span>Schema, docs, concepts, policy</span></div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-node"><strong>Fireworks</strong><span>Logical plan + SQL</span></div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-node"><strong>Deterministic checks</strong><span>Safety + semantics + limits</span></div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-node"><strong>SQLite</strong><span>Bounded execution</span></div>
+      </div>
+
+      <div class="two-column">
+        <article class="card">
+          <p class="eyebrow">Control plane</p>
+          <h3>Version what determines meaning</h3>
+          <ul class="plain-list">
+            <li>Data-source profile and schema fingerprint</li>
+            <li>Documentation and ontology versions</li>
+            <li>Table and column authorization policy</li>
+            <li>Model and prompt version</li>
+            <li>Frozen evaluation corpus and release thresholds</li>
+          </ul>
+        </article>
+        <article class="card">
+          <p class="eyebrow">Request plane</p>
+          <h3>Bound every untrusted operation</h3>
+          <ul class="plain-list">
+            <li>Question length and request identity</li>
+            <li>Model request deadline and retries</li>
+            <li>Plan ambiguity and confidence</li>
+            <li>SQL statement, object, row, byte, and time limits</li>
+            <li>Redacted audit outcome and metrics</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="callout subtle">
+        <div>
+          <h3>Browser demo versus production runtime</h3>
+          <p>
+            This page uses a public in-memory database. The Python candidate adds
+            filesystem read-only mode, SQLite authorization callbacks, progress
+            cancellation, per-request connections, and durable redacted audit logs.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="controls-panel" role="tabpanel" aria-labelledby="controls-tab" data-panel="controls" hidden>
+      <div class="section-heading">
+        <p class="eyebrow">Production controls</p>
+        <h2>Each original QA blocker maps to an explicit control.</h2>
+      </div>
+
+      <div class="control-list">
+        <article><span class="control-state complete">Implemented</span><h3>Model lifecycle</h3><p>Retired-model denial, configurable active model, timeout, total deadline, and bounded retries.</p></article>
+        <article><span class="control-state complete">Implemented</span><h3>Result containment</h3><p>Incremental fetch, page limit, serialized byte cap, truncation signal, and continuation support.</p></article>
+        <article><span class="control-state complete">Implemented</span><h3>Semantic mismatch detection</h3><p>Logical plan, concept mappings, required objects, confidence floor, clarification, and one repair.</p></article>
+        <article><span class="control-state complete">Implemented</span><h3>Data-source binding</h3><p>Schema fingerprint, matching documentation, ontology version, and authorization-aware context.</p></article>
+        <article><span class="control-state complete">Implemented</span><h3>Operational isolation</h3><p>Per-request connections, cancellation, read-only authorizer, identity context, and redacted audit.</p></article>
+        <article><span class="control-state pending">Release evidence</span><h3>Generalization and load</h3><p>Held-out schemas, confidence intervals, adversarial suites, and sustained provider load remain release gates.</p></article>
+      </div>
+
+      <article class="card">
+        <h3>Browser-specific safety boundary</h3>
+        <p>
+          The browser copy is disposable and public. SQL runs in a worker against
+          an in-memory database. A slow query terminates the worker; a reload
+          restores the original database. Never substitute customer data here.
+        </p>
+      </article>
+    </section>
+
+    <section class="panel" id="roadmap-panel" role="tabpanel" aria-labelledby="roadmap-tab" data-panel="roadmap" hidden>
+      <div class="section-heading">
+        <p class="eyebrow">Release roadmap</p>
+        <h2>Implementation is ahead of certification.</h2>
+        <p>The remaining work is evidence collection and deployment validation—not another prompt-only iteration.</p>
+      </div>
+
+      <ol class="roadmap">
+        <li><span>01</span><div><h3>Publish the browser demonstration</h3><p>Deploy this Fireworks-only site through GitHub Pages with no repository secret.</p></div><strong>Now</strong></li>
+        <li><span>02</span><div><h3>Run the live candidate evaluation</h3><p>Validate the current model and structured plan contract on the Linux VM.</p></div><strong>Next</strong></li>
+        <li><span>03</span><div><h3>Expand held-out quality evidence</h3><p>Add unseen schemas, ambiguity, adversarial inputs, schema drift, and repeated runs.</p></div><strong>P0</strong></li>
+        <li><span>04</span><div><h3>Exercise operational degradation</h3><p>Test 429, timeout, malformed response, cancellation, and provider outage paths.</p></div><strong>P0</strong></li>
+        <li><span>05</span><div><h3>Measure production-like load</h3><p>Report P50/P95/P99, error rate, cost, and concurrency isolation.</p></div><strong>P1</strong></li>
+        <li><span>06</span><div><h3>Approve a controlled pilot</h3><p>Release only after quality, safety, reliability, and audit gates pass.</p></div><strong>Gate</strong></li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner">
+      <span>Fireworks Text-to-SQL production candidate</span>
+      <span>Public demo data · User-supplied API key · No key storage</span>
+    </div>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

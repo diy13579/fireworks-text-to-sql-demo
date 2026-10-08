@@ -1,0 +1,25 @@
+{
+  "data_source_id": "bird-financial",
+  "documentation_dir": "database_description",
+  "schema_version": "bird-financial-1",
+  "expected_schema_fingerprint": "40b60b9df9fc2dcf25f5617e",
+  "documentation_version": "bird-financial-docs-1",
+  "ontology_version": "bird-financial-ontology-1",
+  "concepts": {
+    "account_location": [
+      "account.district_id"
+    ],
+    "client_residence": [
+      "client.district_id"
+    ],
+    "district_name": [
+      "district.A2"
+    ],
+    "region": [
+      "district.A3"
+    ],
+    "account_owner": [
+      "disp.type"
+    ]
+  }
+}

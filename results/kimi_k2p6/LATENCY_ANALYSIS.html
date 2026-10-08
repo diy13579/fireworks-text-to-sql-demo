@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Text-to-SQL Latency Analysis</title>
+  <meta name="description" content="Measured latency analysis and optimization plan for the Fireworks text-to-SQL CLI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #17201d;
+      --muted: #5b6661;
+      --paper: #f4f2ec;
+      --surface: #fffefa;
+      --line: #d8d6ce;
+      --green: #147a5a;
+      --green-soft: #dcece5;
+      --red: #c84735;
+      --red-soft: #f6dfd9;
+      --amber: #a76a12;
+      --amber-soft: #f5e8c9;
+      --blue: #28658a;
+      --blue-soft: #dce9ef;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(23, 32, 29, .035) 32px),
+        repeating-linear-gradient(90deg, transparent 0, transparent 31px, rgba(23, 32, 29, .035) 32px);
+      font-family: "Manrope", sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+    button { font: inherit; }
+    .shell { width: min(calc(100% - 40px), var(--max)); margin: 0 auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgba(244, 242, 236, .94);
+      backdrop-filter: blur(12px);
+    }
+    .topbar .shell {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand { font-weight: 700; }
+    .brand span { color: var(--green); }
+    nav { display: flex; gap: 20px; font-size: 13px; color: var(--muted); }
+    nav a { text-decoration: none; }
+    nav a:hover { color: var(--ink); }
+
+    header { padding: 72px 0 46px; border-bottom: 1px solid var(--line); }
+    .eyebrow, .mono {
+      font-family: "IBM Plex Mono", monospace;
+      letter-spacing: 0;
+    }
+    .eyebrow { color: var(--green); font-size: 12px; font-weight: 500; text-transform: uppercase; }
+    h1 { max-width: 820px; margin: 14px 0 18px; font-size: clamp(36px, 6vw, 68px); line-height: 1.02; letter-spacing: 0; }
+    .lede { max-width: 760px; margin: 0; color: var(--muted); font-size: 18px; }
+    .verdict {
+      max-width: 900px;
+      margin-top: 30px;
+      padding: 18px 20px;
+      border-left: 5px solid var(--red);
+      background: var(--red-soft);
+      font-weight: 600;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .metric { min-height: 150px; padding: 26px; border-right: 1px solid var(--line); }
+    .metric:last-child { border-right: 0; }
+    .metric-label { color: var(--muted); font-size: 13px; }
+    .metric-value { margin: 8px 0 2px; font-size: 35px; line-height: 1; font-weight: 700; }
+    .metric-note { color: var(--muted); font-size: 12px; }
+    .bad { color: var(--red); }
+    .good { color: var(--green); }
+
+    main section { padding: 66px 0; border-bottom: 1px solid var(--line); }
+    .section-grid { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 64px; }
+    .section-intro h2 { margin: 8px 0 14px; font-size: 28px; line-height: 1.15; }
+    .section-intro p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .panel { border: 1px solid var(--line); background: var(--surface); }
+    .panel-head { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .panel-head h3 { margin: 0; font-size: 16px; }
+    .legend { display: flex; gap: 14px; color: var(--muted); font-size: 11px; }
+    .legend i { display: inline-block; width: 9px; height: 9px; margin-right: 5px; }
+
+    .bars { padding: 16px 20px 20px; }
+    .bar-row { display: grid; grid-template-columns: 58px minmax(0, 1fr) 72px; gap: 12px; align-items: center; min-height: 38px; }
+    .bar-label { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+    .track { position: relative; height: 14px; background: #e9e7e0; overflow: visible; }
+    .track::after { content: ""; position: absolute; top: -5px; bottom: -5px; left: 5.66%; width: 2px; background: var(--red); }
+    .fill { height: 100%; min-width: 2px; background: var(--blue); transform-origin: left; animation: grow .8s ease-out both; }
+    .fill.t1 { background: var(--green); }
+    .fill.t2 { background: var(--amber); }
+    .fill.t3 { background: var(--blue); }
+    .bar-value { text-align: right; font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+    @keyframes grow { from { transform: scaleX(0); } }
+
+    .target-note { margin: 10px 20px 18px; color: var(--muted); font-size: 12px; }
+    .target-line { color: var(--red); font-weight: 700; }
+
+    .stage-list { display: grid; gap: 12px; }
+    .stage {
+      display: grid;
+      grid-template-columns: 190px 1fr 120px;
+      align-items: center;
+      gap: 18px;
+      padding: 17px 20px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .stage-name { font-weight: 650; }
+    .stage-desc { color: var(--muted); font-size: 13px; }
+    .stage-number { text-align: right; font-family: "IBM Plex Mono", monospace; font-size: 13px; }
+    .stage.primary { border-left: 5px solid var(--red); }
+    .stage.secondary { border-left: 5px solid var(--amber); }
+    .stage.minor { border-left: 5px solid var(--green); }
+
+    .callout {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #b8cbd5;
+      background: var(--blue-soft);
+      font-size: 14px;
+    }
+
+    .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .tier { padding: 20px; border: 1px solid var(--line); background: var(--surface); }
+    .tier h3 { margin: 0 0 16px; font-size: 15px; }
+    .tier-value { font-size: 30px; font-weight: 700; }
+    .tier small { color: var(--muted); }
+    .tier-scale { height: 7px; margin-top: 18px; background: #e9e7e0; }
+    .tier-scale span { display: block; height: 100%; background: var(--amber); }
+
+    .evidence { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); font-size: 13px; }
+    .evidence th, .evidence td { padding: 13px 15px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .evidence th { color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; }
+    .evidence tr:last-child td { border-bottom: 0; }
+    .tag { display: inline-block; padding: 3px 7px; border: 1px solid currentColor; font-family: "IBM Plex Mono", monospace; font-size: 10px; text-transform: uppercase; }
+    .tag.measured { color: var(--green); background: var(--green-soft); }
+    .tag.observed { color: var(--blue); background: var(--blue-soft); }
+    .tag.inferred { color: var(--amber); background: var(--amber-soft); }
+
+    .steps { counter-reset: step; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    .step { counter-increment: step; display: grid; grid-template-columns: 52px minmax(0, 1fr) 180px; gap: 20px; padding: 22px; background: var(--surface); }
+    .step::before { content: counter(step, decimal-leading-zero); font-family: "IBM Plex Mono", monospace; color: var(--green); font-weight: 500; }
+    .step h3 { margin: 0 0 6px; font-size: 16px; }
+    .step p { margin: 0; color: var(--muted); font-size: 13px; }
+    .step-impact { align-self: center; font-family: "IBM Plex Mono", monospace; font-size: 11px; text-align: right; }
+
+    .experiment { margin-top: 22px; padding: 22px; border: 1px solid var(--line); background: var(--ink); color: #f7f5ef; }
+    .experiment h3 { margin: 0 0 14px; }
+    .experiment-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .experiment-grid div { border-top: 1px solid #52605a; padding-top: 10px; }
+    .experiment-grid span { display: block; color: #aeb8b3; font-size: 11px; }
+    .experiment-grid strong { display: block; margin-top: 5px; font-size: 13px; }
+
+    footer { padding: 34px 0 50px; color: var(--muted); font-size: 12px; }
+    footer .shell { display: flex; justify-content: space-between; gap: 20px; }
+
+    @media (max-width: 820px) {
+      nav { display: none; }
+      header { padding-top: 48px; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric:nth-child(2) { border-right: 0; }
+      .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .section-grid { grid-template-columns: 1fr; gap: 26px; }
+      .tier-grid { grid-template-columns: 1fr; }
+      .stage { grid-template-columns: 1fr; gap: 5px; }
+      .stage-number { text-align: left; }
+      .step { grid-template-columns: 40px minmax(0, 1fr); }
+      .step-impact { grid-column: 2; text-align: left; }
+      .experiment-grid { grid-template-columns: 1fr 1fr; }
+      .evidence-wrap { overflow-x: auto; }
+    }
+
+    @media (max-width: 520px) {
+      .shell { width: min(calc(100% - 24px), var(--max)); }
+      h1 { font-size: 38px; }
+      .metrics { grid-template-columns: 1fr; }
+      .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+      .metric:last-child { border-bottom: 0; }
+      .bar-row { grid-template-columns: 48px minmax(0, 1fr) 58px; gap: 8px; }
+      .experiment-grid { grid-template-columns: 1fr; }
+      footer .shell { display: block; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .fill { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="shell">
+      <div class="brand">Text-to-SQL <span>/ latency review</span></div>
+      <nav aria-label="Report sections">
+        <a href="#distribution">Distribution</a>
+        <a href="#bottleneck">Bottleneck</a>
+        <a href="#optimization">Optimization</a>
+      </nav>
+    </div>
+  </div>
+
+  <header>
+    <div class="shell">
+      <div class="eyebrow">Measured benchmark analysis · September 18, 2026</div>
+      <h1>Accuracy is ready. Latency is not.</h1>
+      <p class="lede">Kimi K2.6 produced correct results for all ten development questions, but the median request took 14.28 seconds against a target below 3 seconds. Local SQL is not the limiting stage.</p>
+      <div class="verdict">Primary bottleneck: the remote Fireworks generation path, including model inference, reasoning, and network time. It accounts for at least 99.0% of every measured request.</div>
+    </div>
+  </header>
+
+  <div class="shell metrics" aria-label="Key metrics">
+    <div class="metric">
+      <div class="metric-label">Execution accuracy</div>
+      <div class="metric-value good">10/10</div>
+      <div class="metric-note">All tiers passed</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">P50 end-to-end</div>
+      <div class="metric-value bad">14.28s</div>
+      <div class="metric-note">4.8× over target</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Requests under 3s</div>
+      <div class="metric-value bad">1/10</div>
+      <div class="metric-note">10% target attainment</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Median SQLite execution</div>
+      <div class="metric-value good">2.7ms</div>
+      <div class="metric-note">Across 1,000 local executions</div>
+    </div>
+  </div>
+
+  <main>
+    <section id="distribution">
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">01 / Distribution</div>
+          <h2>Long tail, even without SQL repair</h2>
+          <p>All final benchmark cases succeeded without the SQL execution-repair loop. The spread therefore originates before local execution repair.</p>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>End-to-end latency by question</h3>
+              <div class="legend"><span><i style="background:var(--green)"></i>Tier 1</span><span><i style="background:var(--amber)"></i>Tier 2</span><span><i style="background:var(--blue)"></i>Tier 3</span></div>
+            </div>
+            <div class="bars">
+              <div class="bar-row"><div class="bar-label">q_001</div><div class="track"><div class="fill t1" style="width:31.33%"></div></div><div class="bar-value">16.62s</div></div>
+              <div class="bar-row"><div class="bar-label">q_002</div><div class="track"><div class="fill t1" style="width:9.55%"></div></div><div class="bar-value">5.07s</div></div>
+              <div class="bar-row"><div class="bar-label">q_003</div><div class="track"><div class="fill t1" style="width:3.94%"></div></div><div class="bar-value">2.09s</div></div>
+              <div class="bar-row"><div class="bar-label">q_004</div><div class="track"><div class="fill t1" style="width:6.57%"></div></div><div class="bar-value">3.48s</div></div>
+              <div class="bar-row"><div class="bar-label">q_005</div><div class="track"><div class="fill t2" style="width:8.62%"></div></div><div class="bar-value">4.57s</div></div>
+              <div class="bar-row"><div class="bar-label">q_006</div><div class="track"><div class="fill t2" style="width:25.09%"></div></div><div class="bar-value">13.31s</div></div>
+              <div class="bar-row"><div class="bar-label">q_007</div><div class="track"><div class="fill t2" style="width:54.79%"></div></div><div class="bar-value">29.06s</div></div>
+              <div class="bar-row"><div class="bar-label">q_008</div><div class="track"><div class="fill t3" style="width:100%"></div></div><div class="bar-value">53.03s</div></div>
+              <div class="bar-row"><div class="bar-label">q_009</div><div class="track"><div class="fill t3" style="width:28.74%"></div></div><div class="bar-value">15.24s</div></div>
+              <div class="bar-row"><div class="bar-label">q_010</div><div class="track"><div class="fill t3" style="width:29.00%"></div></div><div class="bar-value">15.38s</div></div>
+            </div>
+            <div class="target-note"><span class="target-line">Red marker</span> = 3-second target. Scale maximum = 53.03 seconds.</div>
+          </div>
+
+          <div class="tier-grid" style="margin-top:12px">
+            <div class="tier"><h3>Tier 1 · median</h3><div class="tier-value">4.28s</div><small>Mean 6.82s · range 2.09–16.62s</small><div class="tier-scale"><span style="width:15.3%"></span></div></div>
+            <div class="tier"><h3>Tier 2 · median</h3><div class="tier-value">13.31s</div><small>Mean 15.65s · range 4.57–29.06s</small><div class="tier-scale"><span style="width:47.7%"></span></div></div>
+            <div class="tier"><h3>Tier 3 · median</h3><div class="tier-value">15.38s</div><small>Mean 27.88s · range 15.24–53.03s</small><div class="tier-scale"><span style="width:55.1%"></span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="bottleneck">
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">02 / Attribution</div>
+          <h2>The database is not the bottleneck</h2>
+          <p>The final SQL for each case was replayed locally 30 times for per-query attribution. An earlier 100-run sample produced the same millisecond-scale conclusion.</p>
+        </div>
+        <div>
+          <div class="stage-list">
+            <div class="stage primary">
+              <div class="stage-name">Remote generation path</div>
+              <div class="stage-desc">Fireworks request, network, Kimi inference/reasoning, structured decoding, and small client overhead.</div>
+              <div class="stage-number">≥99.0%</div>
+            </div>
+            <div class="stage secondary">
+              <div class="stage-name">SQLite date scan</div>
+              <div class="stage-desc">q_007 is the slowest local query because <span class="mono">strftime</span> scans transaction dates.</div>
+              <div class="stage-number">291ms median</div>
+            </div>
+            <div class="stage minor">
+              <div class="stage-name">Typical SQLite query</div>
+              <div class="stage-desc">Counts, joins, grouping, and aggregation across the supplied local database.</div>
+              <div class="stage-number">2.7ms median</div>
+            </div>
+            <div class="stage minor">
+              <div class="stage-name">Schema context build</div>
+              <div class="stage-desc">One-time startup work; completed before the per-question timer begins.</div>
+              <div class="stage-number">32.8ms median</div>
+            </div>
+          </div>
+          <div class="callout"><strong>Diagnostic evidence:</strong> during development, a failed response ended with <span class="mono">finish_reason=length</span>, used all 1,000 completion tokens as reasoning tokens, and emitted no SQL. Raising the budget recovered correctness but increased tail latency. The final evaluator does not persist per-call token usage, so exact token-to-latency correlation remains an instrumentation gap.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">03 / Evidence</div>
+          <h2>What is proven versus inferred</h2>
+          <p>This distinction matters: the report should not claim model compute time when the current telemetry combines inference and network time.</p>
+        </div>
+        <div class="evidence-wrap">
+          <table class="evidence">
+            <thead><tr><th>Finding</th><th>Evidence</th><th>Confidence</th></tr></thead>
+            <tbody>
+              <tr><td>Local SQL is not the primary bottleneck.</td><td>2.7ms median SQLite versus 14.28s P50 end to end; minimum non-database share is 99.0%.</td><td><span class="tag measured">Measured</span></td></tr>
+              <tr><td>Latency has a severe long tail.</td><td>2.09s minimum, 53.03s maximum, 15.79s mean, and 29.06s nearest-rank P90.</td><td><span class="tag measured">Measured</span></td></tr>
+              <tr><td>Harder questions are generally slower.</td><td>Tier medians rise from 4.28s to 13.31s to 15.38s, though q_001 shows substantial variance within tiers.</td><td><span class="tag measured">Measured</span></td></tr>
+              <tr><td>Reasoning token consumption contributes to tail latency.</td><td>Truncated probes exhausted reasoning budgets; larger budgets recovered output but created 70–124s observed attempts.</td><td><span class="tag observed">Observed</span></td></tr>
+              <tr><td>Inference dominates network time.</td><td>Likely for long reasoning sequences, but current telemetry does not split queue, network, and server inference.</td><td><span class="tag inferred">Inferred</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="optimization">
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">04 / Optimization</div>
+          <h2>Optimize the remote path first</h2>
+          <p>Keep execution accuracy as a hard gate. Every experiment should use the same ten questions plus repeated runs to expose variance.</p>
+        </div>
+        <div>
+          <div class="steps">
+            <div class="step"><div><h3>Instrument model calls</h3><p>Persist request count, queue/server timing if exposed, prompt tokens, reasoning tokens, output tokens, finish reason, truncation retry, SQL repair, and model name.</p></div><div class="step-impact">Enables true attribution</div></div>
+            <div class="step"><div><h3>Benchmark faster serverless models</h3><p>Compare non-reasoning or lower-latency structured-output models with Kimi using accuracy, P50, P95, cost, and truncation rate.</p></div><div class="step-impact">Largest likely gain</div></div>
+            <div class="step"><div><h3>Add a fast-model cascade</h3><p>Send each question to the fast model first. Escalate to Kimi only after validation failure or a low-confidence/ambiguous classification.</p></div><div class="step-impact">Target ≥80% fast path</div></div>
+            <div class="step"><div><h3>Retrieve only relevant schema</h3><p>Use deterministic table/column selection first, always preserving join edges and encoded-value documentation. Avoid an embedding network call for this eight-table schema.</p></div><div class="step-impact">Lower input and reasoning load</div></div>
+            <div class="step"><div><h3>Cap tail latency</h3><p>Replace the automatic 8,192-token retry in the interactive path with a deadline. Offer escalation explicitly or run it asynchronously instead of blocking the CLI.</p></div><div class="step-impact">Controls P95/P99</div></div>
+            <div class="step"><div><h3>Optimize q_007 locally later</h3><p>Store/index a normalized year column or use an index-friendly date range. This saves roughly 0.29s, useful only after model latency is reduced.</p></div><div class="step-impact">Secondary optimization</div></div>
+          </div>
+
+          <div class="experiment">
+            <h3>Next experiment: accuracy–latency frontier</h3>
+            <div class="experiment-grid">
+              <div><span>Variants</span><strong>Kimi baseline, 2–3 faster models, fast→Kimi cascade</strong></div>
+              <div><span>Sample size</span><strong>10 questions × 5 runs per variant</strong></div>
+              <div><span>Quality gate</span><strong>≥95% execution accuracy; no unsafe SQL</strong></div>
+              <div><span>Success target</span><strong>P50 &lt;3s, P95 &lt;10s, fallback &lt;20%</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell section-grid">
+        <div class="section-intro">
+          <div class="eyebrow">05 / Decision</div>
+          <h2>Recommended architecture</h2>
+          <p>The current single-model system is an accuracy baseline, not the final interactive architecture.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Proposed request path</h3></div>
+          <div style="padding:24px; display:grid; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:13px">
+            <div style="padding:14px;background:var(--green-soft);border-left:4px solid var(--green)">Question + compact relevant schema → fast structured-output model</div>
+            <div style="padding:14px;background:var(--surface);border:1px solid var(--line)">Validate read-only SQL → execute locally → return immediately on success</div>
+            <div style="padding:14px;background:var(--amber-soft);border-left:4px solid var(--amber)">Escalate ambiguity, truncation, or execution failure → Kimi K2.6</div>
+            <div style="padding:14px;background:var(--red-soft);border-left:4px solid var(--red)">Enforce request deadline → fail clearly instead of blocking for 30–120 seconds</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <span>Source: evaluation_results.json · final 10/10 benchmark run</span>
+      <span>Local replay: 30 runs/query · Windows · SQLite</span>
+    </div>
+  </footer>
+</body>
+</html>

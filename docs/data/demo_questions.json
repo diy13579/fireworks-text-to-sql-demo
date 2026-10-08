@@ -1,0 +1,177 @@
+[
+  {
+    "id": "q_001",
+    "question": "How many bank accounts are located in the Prague region?",
+    "tier": 1,
+    "expected_result": [
+      {
+        "account_count": 554
+      }
+    ]
+  },
+  {
+    "id": "q_002",
+    "question": "What is the total approved loan amount for loans whose contract is finished and fully paid with no problems?",
+    "tier": 1,
+    "expected_result": [
+      {
+        "total_amount": 18603216
+      }
+    ]
+  },
+  {
+    "id": "q_003",
+    "question": "How many disposition records represent account owners (not authorized users)?",
+    "tier": 1,
+    "expected_result": [
+      {
+        "owner_count": 4500
+      }
+    ]
+  },
+  {
+    "id": "q_004",
+    "question": "What is the average monthly loan payment amount across all loans?",
+    "tier": 1,
+    "expected_result": [
+      {
+        "avg_monthly_payment": 4190.66
+      }
+    ]
+  },
+  {
+    "id": "q_005",
+    "question": "How many female clients live in districts where the average salary is greater than 10,000?",
+    "tier": 2,
+    "expected_result": [
+      {
+        "client_count": 636
+      }
+    ]
+  },
+  {
+    "id": "q_006",
+    "question": "How many distinct clients are account owners for at least one account in the Prague region?",
+    "tier": 2,
+    "expected_result": [
+      {
+        "client_count": 554
+      }
+    ]
+  },
+  {
+    "id": "q_007",
+    "question": "What is the total transaction amount for account 1 during 1997?",
+    "tier": 2,
+    "expected_result": [
+      {
+        "total_amount": 96418
+      }
+    ]
+  },
+  {
+    "id": "q_008",
+    "question": "For each district in the south Moravia region, how many distinct account owners are there? List district name and owner count, ordered by owner count descending.",
+    "tier": 3,
+    "expected_result": [
+      {
+        "district_name": "Brno - mesto",
+        "owner_count": 128
+      },
+      {
+        "district_name": "Zlin",
+        "owner_count": 92
+      },
+      {
+        "district_name": "Kromeriz",
+        "owner_count": 57
+      },
+      {
+        "district_name": "Brno - venkov",
+        "owner_count": 53
+      },
+      {
+        "district_name": "Zdar nad Sazavou",
+        "owner_count": 53
+      },
+      {
+        "district_name": "Prostejov",
+        "owner_count": 51
+      },
+      {
+        "district_name": "Blansko",
+        "owner_count": 50
+      },
+      {
+        "district_name": "Vyskov",
+        "owner_count": 49
+      },
+      {
+        "district_name": "Trebic",
+        "owner_count": 45
+      },
+      {
+        "district_name": "Breclav",
+        "owner_count": 44
+      },
+      {
+        "district_name": "Uherske Hradiste",
+        "owner_count": 44
+      },
+      {
+        "district_name": "Hodonin",
+        "owner_count": 41
+      },
+      {
+        "district_name": "Znojmo",
+        "owner_count": 39
+      },
+      {
+        "district_name": "Jihlava",
+        "owner_count": 32
+      }
+    ]
+  },
+  {
+    "id": "q_009",
+    "question": "Which five clients with account owner status have the highest total loan amounts across their owned accounts? Show client id, gender, and total loan amount.",
+    "tier": 3,
+    "expected_result": [
+      {
+        "client_id": 9340,
+        "gender": "M",
+        "total_loan_amount": 590820
+      },
+      {
+        "client_id": 10997,
+        "gender": "F",
+        "total_loan_amount": 566640
+      },
+      {
+        "client_id": 2823,
+        "gender": "F",
+        "total_loan_amount": 541200
+      },
+      {
+        "client_id": 981,
+        "gender": "M",
+        "total_loan_amount": 538500
+      },
+      {
+        "client_id": 3546,
+        "gender": "M",
+        "total_loan_amount": 504000
+      }
+    ]
+  },
+  {
+    "id": "q_010",
+    "question": "How many running loan contracts that are in good standing are linked to accounts owned by male clients living in the north Bohemia region?",
+    "tier": 3,
+    "expected_result": [
+      {
+        "loan_count": 18
+      }
+    ]
+  }
+]

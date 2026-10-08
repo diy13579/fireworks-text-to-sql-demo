@@ -1,0 +1,448 @@
+{
+  "definition": "Wall-clock seconds for agent.ask(): natural-language question through SQL generation (including truncation and repair retries), SQLite execution, and deterministic answer formatting.",
+  "model": "accounts/fireworks/models/kimi-k2p6",
+  "session_id": "fireworks-text2sql-cache-20260919",
+  "prompt_cache_key": "text2sql-f8c4e049b704f5b295225a59",
+  "summary": {
+    "count": 10,
+    "passed": 10,
+    "failed": 0,
+    "accuracy": 1.0,
+    "mean_s": 11.795,
+    "p50_s": 7.271,
+    "p95_s": 31.586,
+    "min_s": 2.861,
+    "max_s": 34.137,
+    "total_s": 117.951
+  },
+  "cache_summary": {
+    "prompt_tokens": 12423,
+    "cached_prompt_tokens": 10977,
+    "completion_tokens": 10687,
+    "total_tokens": 23110,
+    "cache_hit_rate": 0.8836,
+    "api_calls": 10
+  },
+  "per_question": [
+    {
+      "id": "q_001",
+      "tier": 1,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 5.703,
+      "repaired": false,
+      "prompt_tokens": 1234,
+      "cached_prompt_tokens": 0,
+      "completion_tokens": 578,
+      "total_tokens": 1812,
+      "cache_hit_rate": 0.0,
+      "api_calls": 1,
+      "sql": "SELECT COUNT(*) FROM account JOIN district ON account.district_id = district.district_id WHERE district.A3 = 'Prague'",
+      "answer": "COUNT(*): 554",
+      "actual_result": [
+        {
+          "COUNT(*)": 554
+        }
+      ],
+      "expected_result": [
+        {
+          "account_count": 554
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "q_002",
+      "tier": 1,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 2.861,
+      "repaired": false,
+      "prompt_tokens": 1243,
+      "cached_prompt_tokens": 1218,
+      "completion_tokens": 324,
+      "total_tokens": 1567,
+      "cache_hit_rate": 0.9799,
+      "api_calls": 1,
+      "sql": "SELECT SUM(amount) FROM loan WHERE status = 'A'",
+      "answer": "SUM(amount): 18603216",
+      "actual_result": [
+        {
+          "SUM(amount)": 18603216
+        }
+      ],
+      "expected_result": [
+        {
+          "total_amount": 18603216
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "q_003",
+      "tier": 1,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 3.864,
+      "repaired": false,
+      "prompt_tokens": 1235,
+      "cached_prompt_tokens": 1220,
+      "completion_tokens": 277,
+      "total_tokens": 1512,
+      "cache_hit_rate": 0.9879,
+      "api_calls": 1,
+      "sql": "SELECT COUNT(*) FROM disp WHERE type = 'OWNER'",
+      "answer": "COUNT(*): 4500",
+      "actual_result": [
+        {
+          "COUNT(*)": 4500
+        }
+      ],
+      "expected_result": [
+        {
+          "owner_count": 4500
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "q_004",
+      "tier": 1,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 3.584,
+      "repaired": false,
+      "prompt_tokens": 1235,
+      "cached_prompt_tokens": 1221,
+      "completion_tokens": 323,
+      "total_tokens": 1558,
+      "cache_hit_rate": 0.9887,
+      "api_calls": 1,
+      "sql": "SELECT ROUND(AVG(payments), 2) AS average_monthly_payment FROM loan",
+      "answer": "average_monthly_payment: 4190.66",
+      "actual_result": [
+        {
+          "average_monthly_payment": 4190.66
+        }
+      ],
+      "expected_result": [
+        {
+          "avg_monthly_payment": 4190.66
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "q_005",
+      "tier": 2,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 3.988,
+      "repaired": false,
+      "prompt_tokens": 1242,
+      "cached_prompt_tokens": 1220,
+      "completion_tokens": 444,
+      "total_tokens": 1686,
+      "cache_hit_rate": 0.9823,
+      "api_calls": 1,
+      "sql": "SELECT COUNT(DISTINCT client.client_id) FROM client JOIN district ON client.district_id = district.district_id WHERE client.gender = 'F' AND district.A11 > 10000",
+      "answer": "COUNT(DISTINCT client.client_id): 636",
+      "actual_result": [
+        {
+          "COUNT(DISTINCT client.client_id)": 636
+        }
+      ],
+      "expected_result": [
+        {
+          "client_count": 636
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "q_006",
+      "tier": 2,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 8.839,
+      "repaired": false,
+      "prompt_tokens": 1240,
+      "cached_prompt_tokens": 1220,
+      "completion_tokens": 1228,
+      "total_tokens": 2468,
+      "cache_hit_rate": 0.9839,
+      "api_calls": 1,
+      "sql": "SELECT COUNT(DISTINCT c.client_id) AS num_clients FROM client c JOIN disp d ON c.client_id = d.client_id JOIN account a ON d.account_id = a.account_id JOIN district di ON a.district_id = di.district_id WHERE d.type = 'OWNER' AND di.A3 = 'Prague'",
+      "answer": "num_clients: 554",
+      "actual_result": [
+        {
+          "num_clients": 554
+        }
+      ],
+      "expected_result": [
+        {
+          "client_count": 554
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "q_007",
+      "tier": 2,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 28.469,
+      "repaired": false,
+      "prompt_tokens": 1238,
+      "cached_prompt_tokens": 1222,
+      "completion_tokens": 2406,
+      "total_tokens": 3644,
+      "cache_hit_rate": 0.9871,
+      "api_calls": 1,
+      "sql": "SELECT SUM(amount) AS total_transaction_amount FROM trans WHERE account_id = 1 AND strftime('%Y', date) = '1997'",
+      "answer": "total_transaction_amount: 96418",
+      "actual_result": [
+        {
+          "total_transaction_amount": 96418
+        }
+      ],
+      "expected_result": [
+        {
+          "total_amount": 96418
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "q_008",
+      "tier": 3,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 34.137,
+      "repaired": false,
+      "prompt_tokens": 1254,
+      "cached_prompt_tokens": 1218,
+      "completion_tokens": 2778,
+      "total_tokens": 4032,
+      "cache_hit_rate": 0.9713,
+      "api_calls": 1,
+      "sql": "SELECT d.A2 AS district_name, COUNT(DISTINCT di.client_id) AS owner_count FROM district d LEFT JOIN account a ON d.district_id = a.district_id LEFT JOIN disp di ON a.account_id = di.account_id AND di.type = 'OWNER' WHERE d.A3 = 'south Moravia' GROUP BY d.district_id, d.A2 ORDER BY owner_count DESC",
+      "answer": "[{\"district_name\": \"Brno - mesto\", \"owner_count\": 128}, {\"district_name\": \"Zlin\", \"owner_count\": 92}, {\"district_name\": \"Kromeriz\", \"owner_count\": 57}, {\"district_name\": \"Brno - venkov\", \"owner_count\": 53}, {\"district_name\": \"Zdar nad Sazavou\", \"owner_count\": 53}, {\"district_name\": \"Prostejov\", \"owner_count\": 51}, {\"district_name\": \"Blansko\", \"owner_count\": 50}, {\"district_name\": \"Vyskov\", \"owner_count\": 49}, {\"district_name\": \"Trebic\", \"owner_count\": 45}, {\"district_name\": \"Breclav\", \"owner_count\": 44}, {\"district_name\": \"Uherske Hradiste\", \"owner_count\": 44}, {\"district_name\": \"Hodonin\", \"owner_count\": 41}, {\"district_name\": \"Znojmo\", \"owner_count\": 39}, {\"district_name\": \"Jihlava\", \"owner_count\": 32}]",
+      "actual_result": [
+        {
+          "district_name": "Brno - mesto",
+          "owner_count": 128
+        },
+        {
+          "district_name": "Zlin",
+          "owner_count": 92
+        },
+        {
+          "district_name": "Kromeriz",
+          "owner_count": 57
+        },
+        {
+          "district_name": "Brno - venkov",
+          "owner_count": 53
+        },
+        {
+          "district_name": "Zdar nad Sazavou",
+          "owner_count": 53
+        },
+        {
+          "district_name": "Prostejov",
+          "owner_count": 51
+        },
+        {
+          "district_name": "Blansko",
+          "owner_count": 50
+        },
+        {
+          "district_name": "Vyskov",
+          "owner_count": 49
+        },
+        {
+          "district_name": "Trebic",
+          "owner_count": 45
+        },
+        {
+          "district_name": "Breclav",
+          "owner_count": 44
+        },
+        {
+          "district_name": "Uherske Hradiste",
+          "owner_count": 44
+        },
+        {
+          "district_name": "Hodonin",
+          "owner_count": 41
+        },
+        {
+          "district_name": "Znojmo",
+          "owner_count": 39
+        },
+        {
+          "district_name": "Jihlava",
+          "owner_count": 32
+        }
+      ],
+      "expected_result": [
+        {
+          "district_name": "Brno - mesto",
+          "owner_count": 128
+        },
+        {
+          "district_name": "Zlin",
+          "owner_count": 92
+        },
+        {
+          "district_name": "Kromeriz",
+          "owner_count": 57
+        },
+        {
+          "district_name": "Brno - venkov",
+          "owner_count": 53
+        },
+        {
+          "district_name": "Zdar nad Sazavou",
+          "owner_count": 53
+        },
+        {
+          "district_name": "Prostejov",
+          "owner_count": 51
+        },
+        {
+          "district_name": "Blansko",
+          "owner_count": 50
+        },
+        {
+          "district_name": "Vyskov",
+          "owner_count": 49
+        },
+        {
+          "district_name": "Trebic",
+          "owner_count": 45
+        },
+        {
+          "district_name": "Breclav",
+          "owner_count": 44
+        },
+        {
+          "district_name": "Uherske Hradiste",
+          "owner_count": 44
+        },
+        {
+          "district_name": "Hodonin",
+          "owner_count": 41
+        },
+        {
+          "district_name": "Znojmo",
+          "owner_count": 39
+        },
+        {
+          "district_name": "Jihlava",
+          "owner_count": 32
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "q_009",
+      "tier": 3,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 9.054,
+      "repaired": false,
+      "prompt_tokens": 1252,
+      "cached_prompt_tokens": 1218,
+      "completion_tokens": 825,
+      "total_tokens": 2077,
+      "cache_hit_rate": 0.9728,
+      "api_calls": 1,
+      "sql": "SELECT c.client_id, c.gender, SUM(l.amount) AS total_loan_amount FROM client c JOIN disp d ON c.client_id = d.client_id JOIN loan l ON d.account_id = l.account_id WHERE d.type = 'OWNER' GROUP BY c.client_id, c.gender ORDER BY total_loan_amount DESC LIMIT 5",
+      "answer": "[{\"client_id\": 9340, \"gender\": \"M\", \"total_loan_amount\": 590820}, {\"client_id\": 10997, \"gender\": \"F\", \"total_loan_amount\": 566640}, {\"client_id\": 2823, \"gender\": \"F\", \"total_loan_amount\": 541200}, {\"client_id\": 981, \"gender\": \"M\", \"total_loan_amount\": 538500}, {\"client_id\": 3546, \"gender\": \"M\", \"total_loan_amount\": 504000}]",
+      "actual_result": [
+        {
+          "client_id": 9340,
+          "gender": "M",
+          "total_loan_amount": 590820
+        },
+        {
+          "client_id": 10997,
+          "gender": "F",
+          "total_loan_amount": 566640
+        },
+        {
+          "client_id": 2823,
+          "gender": "F",
+          "total_loan_amount": 541200
+        },
+        {
+          "client_id": 981,
+          "gender": "M",
+          "total_loan_amount": 538500
+        },
+        {
+          "client_id": 3546,
+          "gender": "M",
+          "total_loan_amount": 504000
+        }
+      ],
+      "expected_result": [
+        {
+          "client_id": 9340,
+          "gender": "M",
+          "total_loan_amount": 590820
+        },
+        {
+          "client_id": 10997,
+          "gender": "F",
+          "total_loan_amount": 566640
+        },
+        {
+          "client_id": 2823,
+          "gender": "F",
+          "total_loan_amount": 541200
+        },
+        {
+          "client_id": 981,
+          "gender": "M",
+          "total_loan_amount": 538500
+        },
+        {
+          "client_id": 3546,
+          "gender": "M",
+          "total_loan_amount": 504000
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "q_010",
+      "tier": 3,
+      "passed": true,
+      "status": "PASS",
+      "latency_seconds": 17.452,
+      "repaired": false,
+      "prompt_tokens": 1250,
+      "cached_prompt_tokens": 1220,
+      "completion_tokens": 1504,
+      "total_tokens": 2754,
+      "cache_hit_rate": 0.976,
+      "api_calls": 1,
+      "sql": "SELECT COUNT(DISTINCT loan.loan_id) FROM loan JOIN account ON loan.account_id = account.account_id JOIN disp ON account.account_id = disp.account_id JOIN client ON disp.client_id = client.client_id JOIN district ON client.district_id = district.district_id WHERE loan.status = 'C' AND disp.type = 'OWNER' AND client.gender = 'M' AND district.A3 = 'north Bohemia'",
+      "answer": "COUNT(DISTINCT loan.loan_id): 18",
+      "actual_result": [
+        {
+          "COUNT(DISTINCT loan.loan_id)": 18
+        }
+      ],
+      "expected_result": [
+        {
+          "loan_count": 18
+        }
+      ],
+      "error": null
+    }
+  ]
+}
